@@ -80,11 +80,42 @@ export class ProductsService {
     return { data: product };
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: any) {
+    const variantsData = updateProductDto.variants?.map((v: any) => ({
+      name: v.name,
+      sku: v.sku,
+      price: v.price,
+      stock: v.stock,
+      options: v.options
+    })) || [];
+
+    // Cập nhật sản phẩm cơ bản và ghi đè toàn bộ biến thể
+    const product = await this.prisma.product.update({
+      where: { id },
+      data: {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        price: updateProductDto.price,
+        stock: updateProductDto.stock,
+        categoryId: updateProductDto.categoryId,
+        isActive: updateProductDto.status === 'active',
+        variants: {
+          deleteMany: {},
+          create: variantsData
+        }
+      },
+      include: {
+        variants: true
+      }
+    });
+    return { data: product, message: "Cập nhật thành công" };
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    // Delete product.
+    await this.prisma.product.delete({
+      where: { id }
+    });
+    return { message: "Đã xóa sản phẩm" };
   }
 }

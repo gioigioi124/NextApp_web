@@ -122,6 +122,36 @@ export declare class ProductsController {
             categoryId: string;
         }) | null;
     }>;
-    update(id: string, updateProductDto: UpdateProductDto): string;
-    remove(id: string): string;
+    update(id: string, updateProductDto: UpdateProductDto): Promise<{
+        data: {
+            variants: {
+                id: string;
+                name: string;
+                price: import("@prisma/client/runtime/library").Decimal;
+                sku: string;
+                stock: number;
+                options: import("@prisma/client/runtime/library").JsonValue;
+                productId: string;
+            }[];
+        } & {
+            id: string;
+            name: string;
+            slug: string;
+            description: string;
+            price: import("@prisma/client/runtime/library").Decimal;
+            salePrice: import("@prisma/client/runtime/library").Decimal | null;
+            sku: string;
+            stock: number;
+            isActive: boolean;
+            isFeatured: boolean;
+            tags: string[];
+            createdAt: Date;
+            updatedAt: Date;
+            categoryId: string;
+        };
+        message: string;
+    }>;
+    remove(id: string): Promise<{
+        message: string;
+    }>;
 }

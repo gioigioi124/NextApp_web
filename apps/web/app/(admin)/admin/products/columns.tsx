@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Edit, Copy, Trash2 } from "lucide-react";
+import { MoreHorizontal, Edit, Copy, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,6 +27,54 @@ export type Product = {
   images: any[];
   isActive: boolean;
   variants?: any[];
+};
+
+const ProductActions = ({ product }: { product: Product }) => {
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
+    
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${product.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Xóa thất bại");
+      
+      toast.success("Đã xóa sản phẩm thành công!");
+      router.refresh();
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi xóa sản phẩm.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
+        <span className="sr-only">Open menu</span>
+        {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4" />}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Thao tác</div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer text-primary" onClick={() => router.push(`/admin/products/${product.id}/edit`)}>
+          <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa
+        </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer text-secondary">
+          <Copy className="w-4 h-4 mr-2" /> Nhân bản
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={handleDelete} disabled={isDeleting}>
+          <Trash2 className="w-4 h-4 mr-2" /> Xóa sản phẩm
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -55,7 +106,6 @@ export const columns: ColumnDef<Product>[] = [
         return <span className="text-muted-foreground text-sm">-</span>;
       }
 
-      // Extract unique option keys like "Kích thước", "Màu sắc"
       const keys = new Set<string>();
       variants.forEach(v => {
         if (v.options) {
@@ -123,30 +173,6 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const product = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-            <DropdownMenuItem className="cursor-pointer text-primary">
-              <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer text-secondary">
-              <Copy className="w-4 h-4 mr-2" /> Nhân bản
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
-              <Trash2 className="w-4 h-4 mr-2" /> Xóa sản phẩm
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <ProductActions product={row.original} />,
   },
 ];
