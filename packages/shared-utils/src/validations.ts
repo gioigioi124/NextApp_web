@@ -12,5 +12,15 @@ export const registerSchema = z.object({
   phone: z.string().optional(),
 });
 
+export const productSchema = z.object({
+  name: z.string().min(3, 'Tên sản phẩm tối thiểu 3 ký tự'),
+  description: z.string().min(10, 'Mô tả tối thiểu 10 ký tự'),
+  price: z.coerce.number().min(0, 'Giá không hợp lệ'),
+  stock: z.coerce.number().min(0, 'Tồn kho không hợp lệ'),
+  categoryId: z.string().min(1, 'Vui lòng chọn danh mục'),
+  status: z.enum(['active', 'draft', 'out']).default('active'),
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type ProductInput = z.infer<typeof productSchema>;

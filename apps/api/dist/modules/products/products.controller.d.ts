@@ -4,7 +4,25 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    create(createProductDto: CreateProductDto): string;
+    create(createProductDto: CreateProductDto): Promise<{
+        data: {
+            id: string;
+            name: string;
+            slug: string;
+            description: string;
+            price: import("@prisma/client/runtime/library").Decimal;
+            salePrice: import("@prisma/client/runtime/library").Decimal | null;
+            sku: string;
+            stock: number;
+            isActive: boolean;
+            isFeatured: boolean;
+            tags: string[];
+            createdAt: Date;
+            updatedAt: Date;
+            categoryId: string;
+        };
+        message: string;
+    }>;
     findAll(): Promise<{
         data: ({
             category: {
@@ -26,12 +44,12 @@ export declare class ProductsController {
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
             stock: number;
-            categoryId: string;
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
             createdAt: Date;
             updatedAt: Date;
+            categoryId: string;
         })[];
         meta: {
             total: number;
@@ -77,12 +95,12 @@ export declare class ProductsController {
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
             stock: number;
-            categoryId: string;
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
             createdAt: Date;
             updatedAt: Date;
+            categoryId: string;
         }) | null;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): string;

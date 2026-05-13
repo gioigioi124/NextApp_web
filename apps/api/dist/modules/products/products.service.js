@@ -17,8 +17,30 @@ let ProductsService = class ProductsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    create(createProductDto) {
-        return 'This action adds a new product';
+    async create(createProductDto) {
+        const slug = createProductDto.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+        let category = await this.prisma.category.findFirst();
+        if (!category) {
+            category = await this.prisma.category.create({
+                data: { name: 'Chăn Ga Gối', slug: 'chan-ga-goi' }
+            });
+        }
+        const product = await this.prisma.product.create({
+            data: {
+                name: createProductDto.name,
+                slug: slug + '-' + Date.now().toString().slice(-4),
+                description: createProductDto.description,
+                price: createProductDto.price,
+                stock: createProductDto.stock,
+                categoryId: category.id,
+                sku: 'SKU-' + Date.now().toString().slice(-6),
+                isActive: createProductDto.status === 'active'
+            }
+        });
+        return {
+            data: product,
+            message: "Product created successfully"
+        };
     }
     async findAll() {
         const products = await this.prisma.product.findMany({

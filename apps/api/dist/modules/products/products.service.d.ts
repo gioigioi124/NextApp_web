@@ -1,10 +1,27 @@
-import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 export declare class ProductsService {
     private prisma;
     constructor(prisma: PrismaService);
-    create(createProductDto: CreateProductDto): string;
+    create(createProductDto: any): Promise<{
+        data: {
+            id: string;
+            name: string;
+            slug: string;
+            description: string;
+            price: import("@prisma/client/runtime/library").Decimal;
+            salePrice: import("@prisma/client/runtime/library").Decimal | null;
+            sku: string;
+            stock: number;
+            isActive: boolean;
+            isFeatured: boolean;
+            tags: string[];
+            createdAt: Date;
+            updatedAt: Date;
+            categoryId: string;
+        };
+        message: string;
+    }>;
     findAll(): Promise<{
         data: ({
             category: {
@@ -26,12 +43,12 @@ export declare class ProductsService {
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
             stock: number;
-            categoryId: string;
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
             createdAt: Date;
             updatedAt: Date;
+            categoryId: string;
         })[];
         meta: {
             total: number;
@@ -42,6 +59,13 @@ export declare class ProductsService {
     }>;
     findOne(id: string): Promise<{
         data: ({
+            images: {
+                id: string;
+                url: string;
+                alt: string | null;
+                position: number;
+                productId: string;
+            }[];
             category: {
                 id: string;
                 name: string;
@@ -52,13 +76,6 @@ export declare class ProductsService {
                 image: string | null;
                 parentId: string | null;
             };
-            images: {
-                id: string;
-                url: string;
-                alt: string | null;
-                position: number;
-                productId: string;
-            }[];
             variants: {
                 id: string;
                 name: string;
@@ -77,12 +94,12 @@ export declare class ProductsService {
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
             stock: number;
-            categoryId: string;
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
             createdAt: Date;
             updatedAt: Date;
+            categoryId: string;
         }) | null;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): string;
