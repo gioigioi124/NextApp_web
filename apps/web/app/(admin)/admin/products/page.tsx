@@ -1,7 +1,26 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Download, MoreHorizontal, Edit, Copy, Trash2 } from "lucide-react";
+import { Plus, Search, Filter, Download } from "lucide-react";
+import { DataTable } from "./data-table";
+import { columns, Product } from "./columns";
 
-export default function AdminProductsPage() {
+async function getProducts(): Promise<Product[]> {
+  try {
+    const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/products`, {
+      cache: 'no-store'
+    });
+    if (!res.ok) throw new Error('Failed to fetch products');
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("Fetch products error:", error);
+    return [];
+  }
+}
+
+export default async function AdminProductsPage() {
+  const data = await getProducts();
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -14,10 +33,12 @@ export default function AdminProductsPage() {
           <h2 className="font-heading text-3xl font-bold text-foreground">Quản lý Sản phẩm</h2>
           <p className="text-muted-foreground mt-2">Cập nhật và theo dõi kho hàng Lumina của bạn một cách dễ dàng.</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Thêm sản phẩm mới
-        </Button>
+        <Link href="/admin/products/create">
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" />
+            Thêm sản phẩm mới
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -50,11 +71,7 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <div className="p-12 text-center text-muted-foreground">
-          Bảng danh sách sản phẩm sẽ được hiển thị ở đây.
-        </div>
-      </div>
+      <DataTable columns={columns} data={data} />
     </div>
   );
 }
