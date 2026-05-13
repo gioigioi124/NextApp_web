@@ -10,15 +10,20 @@ export class ProductsService {
   async create(createProductDto: any) {
     const slug = createProductDto.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
     
-    // Check if categoryId is provided, else create a default or handle error.
-    // For now we assume categoryId "cm3ed" or similar exists, but we can't be sure without seeding.
-    // To make this work safely, let's create a dummy category if it doesn't exist.
     let category = await this.prisma.category.findFirst();
     if (!category) {
       category = await this.prisma.category.create({
         data: { name: 'Chăn Ga Gối', slug: 'chan-ga-goi' }
       });
     }
+
+    const variantsData = createProductDto.variants?.map((v: any) => ({
+      name: v.name,
+      sku: v.sku,
+      price: v.price,
+      stock: v.stock,
+      options: v.options
+    })) || [];
 
     const product = await this.prisma.product.create({
       data: {
@@ -29,7 +34,13 @@ export class ProductsService {
         stock: createProductDto.stock,
         categoryId: category.id,
         sku: 'SKU-' + Date.now().toString().slice(-6),
-        isActive: createProductDto.status === 'active'
+        isActive: createProductDto.status === 'active',
+        variants: {
+          create: variantsData
+        }
+      },
+      include: {
+        variants: true
       }
     });
 
@@ -43,6 +54,7 @@ export class ProductsService {
     const products = await this.prisma.product.findMany({
       include: {
         category: true,
+        variants: true,
       },
       orderBy: {
         createdAt: 'desc'

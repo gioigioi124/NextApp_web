@@ -25,6 +25,13 @@ let ProductsService = class ProductsService {
                 data: { name: 'Chăn Ga Gối', slug: 'chan-ga-goi' }
             });
         }
+        const variantsData = createProductDto.variants?.map((v) => ({
+            name: v.name,
+            sku: v.sku,
+            price: v.price,
+            stock: v.stock,
+            options: v.options
+        })) || [];
         const product = await this.prisma.product.create({
             data: {
                 name: createProductDto.name,
@@ -34,7 +41,13 @@ let ProductsService = class ProductsService {
                 stock: createProductDto.stock,
                 categoryId: category.id,
                 sku: 'SKU-' + Date.now().toString().slice(-6),
-                isActive: createProductDto.status === 'active'
+                isActive: createProductDto.status === 'active',
+                variants: {
+                    create: variantsData
+                }
+            },
+            include: {
+                variants: true
             }
         });
         return {
@@ -46,6 +59,7 @@ let ProductsService = class ProductsService {
         const products = await this.prisma.product.findMany({
             include: {
                 category: true,
+                variants: true,
             },
             orderBy: {
                 createdAt: 'desc'

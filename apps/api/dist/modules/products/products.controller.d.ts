@@ -6,6 +6,16 @@ export declare class ProductsController {
     constructor(productsService: ProductsService);
     create(createProductDto: CreateProductDto): Promise<{
         data: {
+            variants: {
+                id: string;
+                name: string;
+                price: import("@prisma/client/runtime/library").Decimal;
+                sku: string;
+                stock: number;
+                options: import("@prisma/client/runtime/library").JsonValue;
+                productId: string;
+            }[];
+        } & {
             id: string;
             name: string;
             slug: string;
@@ -35,6 +45,15 @@ export declare class ProductsController {
                 image: string | null;
                 parentId: string | null;
             };
+            variants: {
+                id: string;
+                name: string;
+                price: import("@prisma/client/runtime/library").Decimal;
+                sku: string;
+                stock: number;
+                options: import("@prisma/client/runtime/library").JsonValue;
+                productId: string;
+            }[];
         } & {
             id: string;
             name: string;
@@ -62,10 +81,10 @@ export declare class ProductsController {
         data: ({
             images: {
                 id: string;
+                productId: string;
                 url: string;
                 alt: string | null;
                 position: number;
-                productId: string;
             }[];
             category: {
                 id: string;
@@ -83,8 +102,8 @@ export declare class ProductsController {
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
-                productId: string;
                 options: import("@prisma/client/runtime/library").JsonValue;
+                productId: string;
             }[];
         } & {
             id: string;

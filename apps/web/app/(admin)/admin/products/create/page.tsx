@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Info, Layers, Image as ImageIcon, Banknote, CloudUpload } from "lucide-react";
+import { ArrowLeft, Info, Layers, Image as ImageIcon, Banknote, CloudUpload, Trash2, Plus } from "lucide-react";
 import Link from "next/link";
 import { productSchema, ProductInput } from "shared-utils";
 import { toast } from "sonner";
@@ -17,8 +17,12 @@ import { toast } from "sonner";
 export default function CreateProductPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // State for dynamic attributes
+  const [attributes, setAttributes] = useState<{ name: string; values: string[] }[]>([]);
+  const [variants, setVariants] = useState<any[]>([]);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<ProductInput>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
@@ -27,8 +31,93 @@ export default function CreateProductPage() {
       stock: 0,
       categoryId: "cm3ed", // Placeholder for now
       status: "active",
+      attributes: [],
+      variants: []
     }
   });
+
+  const basePrice = watch("price");
+
+  // Generate Cartesian Product of all attributes
+  useEffect(() => {
+    if (attributes.length === 0) {
+      setVariants([]);
+      setValue("attributes", []);
+      setValue("variants", []);
+      return;
+    }
+
+    const generateCombinations = (attrs: typeof attributes) => {
+      const result: any[] = [];
+      const helper = (arr: any[], i: number) => {
+        if (i === attrs.length) {
+          result.push([...arr]);
+          return;
+        }
+        for (let j = 0; j < attrs[i].values.length; j++) {
+          arr[i] = { name: attrs[i].name, value: attrs[i].values[j] };
+          helper(arr, i + 1);
+        }
+      };
+      // Only generate if there are values
+      if (attrs.every(a => a.values.length > 0)) {
+        helper([], 0);
+      }
+      return result;
+    };
+
+    const combs = generateCombinations(attributes);
+    const newVariants = combs.map((comb) => {
+      const name = comb.map((c: any) => c.value).join(" - ");
+      const options = comb.reduce((acc: any, curr: any) => {
+        acc[curr.name] = curr.value;
+        return acc;
+      }, {});
+      
+      // Find existing variant to keep user input
+      const existing = variants.find(v => v.name === name);
+      return {
+        name,
+        options,
+        price: existing?.price || basePrice || 0,
+        stock: existing?.stock || 0,
+        sku: existing?.sku || `SKU-${Date.now().toString().slice(-4)}-${Math.floor(Math.random()*1000)}`
+      };
+    });
+    
+    setVariants(newVariants);
+    setValue("attributes", attributes);
+    setValue("variants", newVariants);
+  }, [attributes, basePrice]);
+
+  const handleAddAttribute = () => {
+    setAttributes([...attributes, { name: "", values: [] }]);
+  };
+
+  const handleRemoveAttribute = (index: number) => {
+    const newAttrs = [...attributes];
+    newAttrs.splice(index, 1);
+    setAttributes(newAttrs);
+  };
+
+  const updateAttributeName = (index: number, name: string) => {
+    const newAttrs = [...attributes];
+    newAttrs[index].name = name;
+    setAttributes(newAttrs);
+  };
+
+  const updateAttributeValues = (index: number, valuesStr: string) => {
+    const newAttrs = [...attributes];
+    newAttrs[index].values = valuesStr.split(",").map(v => v.trim()).filter(v => v !== "");
+    setAttributes(newAttrs);
+  };
+
+  const handleVariantChange = (index: number, field: string, value: string | number) => {
+    const newVariants = [...variants];
+    newVariants[index] = { ...newVariants[index], [field]: value };
+    setVariants(newVariants);
+    setValue("variants", newVariants);
+  };
 
   const onSubmit = async (data: ProductInput) => {
     setIsSubmitting(true);
@@ -105,11 +194,76 @@ export default function CreateProductPage() {
                   <Layers className="w-5 h-5 text-primary" />
                   <h2 className="text-xl font-bold text-foreground">Biến thể sản phẩm</h2>
                 </div>
-                <Button variant="secondary" size="sm" type="button">Thêm thuộc tính</Button>
+                <Button variant="secondary" size="sm" type="button" onClick={handleAddAttribute}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Thêm thuộc tính
+                </Button>
               </div>
-              <div className="text-sm text-muted-foreground text-center py-8 border border-dashed border-border rounded-lg">
-                Chưa có thuộc tính nào được thêm. (Kích thước, Màu sắc...)
-              </div>
+
+              {attributes.length === 0 ? (
+                <div className="text-sm text-muted-foreground text-center py-8 border border-dashed border-border rounded-lg">
+                  Chưa có thuộc tính nào được thêm. (Ví dụ: Kích thước, Màu sắc...)
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {attributes.map((attr, idx) => (
+                    <div key={idx} className="flex gap-4 items-start bg-muted/30 p-4 rounded-lg border border-border">
+                      <div className="space-y-2 flex-1">
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Tên thuộc tính</Label>
+                        <Input 
+                          placeholder="Ví dụ: Kích thước" 
+                          value={attr.name}
+                          onChange={(e) => updateAttributeName(idx, e.target.value)}
+                          className="bg-card h-10" 
+                        />
+                      </div>
+                      <div className="space-y-2 flex-[2]">
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Các giá trị (cách nhau bởi dấu phẩy)</Label>
+                        <Input 
+                          placeholder="Ví dụ: S, M, L" 
+                          value={attr.values.join(", ")}
+                          onChange={(e) => updateAttributeValues(idx, e.target.value)}
+                          className="bg-card h-10" 
+                        />
+                      </div>
+                      <Button variant="ghost" size="icon" type="button" className="mt-6 text-destructive hover:bg-destructive/10" onClick={() => handleRemoveAttribute(idx)}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+
+                  {variants.length > 0 && (
+                    <div className="mt-8 border border-border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm text-left">
+                        <thead className="bg-muted text-muted-foreground text-xs uppercase font-semibold border-b border-border">
+                          <tr>
+                            <th className="px-4 py-3">Biến thể</th>
+                            <th className="px-4 py-3">Giá</th>
+                            <th className="px-4 py-3">Tồn kho</th>
+                            <th className="px-4 py-3">SKU</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {variants.map((variant, idx) => (
+                            <tr key={idx} className="bg-card hover:bg-muted/30">
+                              <td className="px-4 py-3 font-medium text-foreground">{variant.name}</td>
+                              <td className="px-4 py-3">
+                                <Input type="number" className="h-9" value={variant.price} onChange={(e) => handleVariantChange(idx, 'price', Number(e.target.value))} />
+                              </td>
+                              <td className="px-4 py-3">
+                                <Input type="number" className="h-9" value={variant.stock} onChange={(e) => handleVariantChange(idx, 'stock', Number(e.target.value))} />
+                              </td>
+                              <td className="px-4 py-3">
+                                <Input className="h-9" value={variant.sku} onChange={(e) => handleVariantChange(idx, 'sku', e.target.value)} />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
             </section>
           </div>
 
@@ -131,7 +285,7 @@ export default function CreateProductPage() {
             <section className="bg-card p-6 rounded-xl border border-border space-y-6">
               <div className="flex items-center gap-2 mb-2">
                 <Banknote className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-foreground">Giá & Kho</h2>
+                <h2 className="text-xl font-bold text-foreground">Giá & Kho (Cơ bản)</h2>
               </div>
               
               <div className="space-y-4">

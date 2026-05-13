@@ -19,6 +19,17 @@ export const productSchema = z.object({
   stock: z.coerce.number().min(0, 'Tồn kho không hợp lệ'),
   categoryId: z.string().min(1, 'Vui lòng chọn danh mục'),
   status: z.enum(['active', 'draft', 'out']).default('active'),
+  attributes: z.array(z.object({
+    name: z.string(),
+    values: z.array(z.string())
+  })).optional(),
+  variants: z.array(z.object({
+    name: z.string(),
+    sku: z.string(),
+    price: z.coerce.number(),
+    stock: z.coerce.number(),
+    options: z.any()
+  })).optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

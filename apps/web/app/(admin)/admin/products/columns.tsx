@@ -23,6 +23,7 @@ export type Product = {
   category: { name: string } | null;
   images: any[];
   isActive: boolean;
+  variants?: any[];
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -41,6 +42,32 @@ export const columns: ColumnDef<Product>[] = [
             <div className="font-medium text-foreground">{product.name}</div>
             <div className="text-xs text-muted-foreground">SKU: {product.sku}</div>
           </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "variants",
+    header: "BIẾN THỂ",
+    cell: ({ row }) => {
+      const variants = row.original.variants;
+      if (!variants || variants.length === 0) {
+        return <span className="text-muted-foreground text-sm">-</span>;
+      }
+
+      // Extract unique option keys like "Kích thước", "Màu sắc"
+      const keys = new Set<string>();
+      variants.forEach(v => {
+        if (v.options) {
+          Object.keys(v.options).forEach(k => keys.add(k));
+        }
+      });
+      const attrNames = Array.from(keys).join(", ");
+
+      return (
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-medium text-foreground">{variants.length} phân loại</span>
+          {attrNames && <span className="text-xs text-muted-foreground">{attrNames}</span>}
         </div>
       );
     },
