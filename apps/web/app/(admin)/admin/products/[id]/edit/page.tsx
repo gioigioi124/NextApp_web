@@ -27,6 +27,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [categories, setCategories] = useState<any[]>([]);
   // Use ref to read variants inside effects without adding it to dependency array
   const variantsRef = useRef<any[]>([]);
+  // Flag to prevent useEffect from clearing variants right after fetch
+  const justLoadedRef = useRef(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -72,6 +74,33 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         const json = await res.json();
         const product = json.data;
 
+        // Reconstruct attributes from variant options when not explicitly stored
+        let loadedAttributes = product.attributes && product.attributes.length > 0
+          ? product.attributes
+          : [];
+
+        const loadedVariants = product.variants?.map((v: any) => ({
+          ...v,
+          price: Number(v.price)
+        })) || [];
+
+        // If no attributes stored, reconstruct from variant options keys/values
+        if (loadedAttributes.length === 0 && loadedVariants.length > 0) {
+          const attrMap: Record<string, Set<string>> = {};
+          loadedVariants.forEach((v: any) => {
+            if (v.options && typeof v.options === 'object') {
+              Object.entries(v.options).forEach(([key, val]: [string, any]) => {
+                if (!attrMap[key]) attrMap[key] = new Set();
+                attrMap[key].add(String(val));
+              });
+            }
+          });
+          loadedAttributes = Object.entries(attrMap).map(([name, valSet]) => ({
+            name,
+            values: Array.from(valSet)
+          }));
+        }
+
         reset({
           name: product.name,
           description: product.description,
@@ -81,18 +110,13 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           status: product.isActive ? 'active' : 'draft',
           sku: product.sku,
           images: product.images?.map((img: any) => img.url) || [],
-          attributes: product.attributes || [],
-          variants: product.variants?.map((v: any) => ({
-            ...v,
-            price: Number(v.price)
-          })) || [],
+          attributes: loadedAttributes,
+          variants: loadedVariants,
         });
-        
-        setAttributes(product.attributes || []);
-        updateVariants(product.variants?.map((v: any) => ({
-          ...v,
-          price: Number(v.price)
-        })) || []);
+
+        setAttributes(loadedAttributes);
+        updateVariants(loadedVariants);
+        justLoadedRef.current = true; // Signal: skip next useEffect run
 
       } catch (error) {
         toast.error("Không thể tải thông tin sản phẩm");
@@ -106,6 +130,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   // Generate Cartesian Product of all attributes (no `variants` in deps → no loop)
   useEffect(() => {
     if (isLoading) return;
+    // Skip the first run right after fetching to preserve loaded variants
+    if (justLoadedRef.current) {
+      justLoadedRef.current = false;
+      return;
+    }
 
     // Filter out attributes that are empty (no name OR no values) to keep UX smooth
     const activeAttrs = attributes.filter(a => a.name.trim() !== "" && a.values.length > 0);
@@ -138,19 +167,22 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       const name = comb.map((c: any) => c.value).join(" - ");
       const options = comb.reduce((acc: any, curr: any) => { acc[curr.name] = curr.value; return acc; }, {});
       const existing = currentVariants.find(v => v.name === name);
+      
       return {
+        ...existing, // Giữ lại toàn bộ dữ liệu cũ nếu có (id, image, sku, etc.)
         name,
         options,
         price: existing?.price ?? basePrice ?? 0,
         stock: existing?.stock ?? 0,
-        sku: existing?.sku || `SKU-${Date.now().toString().slice(-4)}-${Math.floor(Math.random() * 1000)}`
+        sku: existing?.sku || `SKU-${Date.now().toString().slice(-4)}-${Math.floor(Math.random() * 1000)}`,
+        image: existing?.image || null
       };
     });
 
     const prevNames = JSON.stringify(currentVariants.map(v => v.name));
-    const nextNames = JSON.stringify(newVariants.map(v => v.name));
-    
-    if (prevNames !== nextNames) {
+    const newNames = JSON.stringify(newVariants.map(v => v.name));
+
+    if (newNames !== prevNames) {
       updateVariants(newVariants);
       setValue("variants", newVariants);
     }

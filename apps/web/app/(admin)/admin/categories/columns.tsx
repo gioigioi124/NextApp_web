@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2, Layers } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Layers, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -78,52 +78,129 @@ export const columns: ColumnDef<Category>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const category = row.original;
-      const router = useRouter();
-
-      const onDelete = async () => {
-        if (!confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`)) return;
-        
-        try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories/${category.id}`, {
-            method: 'DELETE'
-          });
-          if (res.ok) {
-            toast.success("Đã xóa danh mục thành công");
-            router.refresh();
-          } else {
-            throw new Error();
-          }
-        } catch (error) {
-          toast.error("Lỗi khi xóa danh mục");
-        }
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger 
-            render={
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuGroup>
-              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Hành động</div>
-              <DropdownMenuItem onClick={() => toast.info("Tính năng đang phát triển")}>
-                <Pencil className="mr-2 h-4 w-4" />
-                <span>Chỉnh sửa</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDelete} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                <Trash2 className="mr-2 h-4 w-4" />
-                <span>Xóa</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <CategoryActions category={row.original} />;
     },
   },
 ];
+
+import { useState, useEffect } from "react";
+import { EditCategoryDialog } from "./edit-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+function CategoryActions({ category }: { category: Category }) {
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const router = useRouter();
+
+  // We need all categories for the parent selection in the edit dialog
+  useEffect(() => {
+    if (showEdit) {
+      const fetchAll = async () => {
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`);
+          if (res.ok) {
+            const json = await res.json();
+            setAllCategories(json.data || []);
+          }
+        } catch (error) {
+          console.error("Failed to fetch all categories:", error);
+        }
+      };
+      fetchAll();
+    }
+  }, [showEdit]);
+
+  const onDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories/${category.id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        toast.success("Đã xóa danh mục thành công");
+        router.refresh();
+      } else {
+        const error = await res.json();
+        toast.error(error.message || "Lỗi khi xóa danh mục. Có thể danh mục này đang chứa sản phẩm.");
+      }
+    } catch (error) {
+      toast.error("Lỗi khi xóa danh mục");
+    } finally {
+      setIsDeleting(false);
+      setShowDelete(false);
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger 
+          render={
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuGroup>
+            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Hành động</div>
+            <DropdownMenuItem onClick={() => setShowEdit(true)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              <span>Chỉnh sửa</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowDelete(true)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>Xóa</span>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <EditCategoryDialog 
+        category={category} 
+        categories={allCategories} 
+        open={showEdit} 
+        onOpenChange={setShowEdit} 
+      />
+
+      <AlertDialog open={showDelete} onOpenChange={setShowDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này sẽ xóa danh mục <strong>{category.name}</strong>. 
+              Lưu ý: Bạn không thể xóa danh mục nếu nó đang chứa sản phẩm hoặc danh mục con.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={(e) => {
+                e.preventDefault();
+                onDelete();
+              }}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              Xác nhận xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+

@@ -29,13 +29,23 @@ export type Product = {
   variants?: any[];
 };
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 const ProductActions = ({ product }: { product: Product }) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
-    
     setIsDeleting(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${product.id}`, {
@@ -50,30 +60,65 @@ const ProductActions = ({ product }: { product: Product }) => {
       toast.error("Có lỗi xảy ra khi xóa sản phẩm.");
     } finally {
       setIsDeleting(false);
+      setShowDeleteDialog(false);
     }
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-        <span className="sr-only">Open menu</span>
-        {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4" />}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Thao tác</div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer text-primary" onClick={() => router.push(`/admin/products/${product.id}/edit`)}>
-          <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa
-        </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer text-secondary">
-          <Copy className="w-4 h-4 mr-2" /> Nhân bản
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={handleDelete} disabled={isDeleting}>
-          <Trash2 className="w-4 h-4 mr-2" /> Xóa sản phẩm
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger 
+          render={
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="w-48">
+          <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Thao tác</div>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/admin/products/${product.id}/edit`)}>
+            <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
+            <Copy className="w-4 h-4 mr-2" /> Nhân bản
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive" 
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" /> Xóa sản phẩm
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa sản phẩm?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này sẽ xóa vĩnh viễn sản phẩm <strong>{product.name}</strong> và các biến thể liên quan. Bạn không thể hoàn tác hành động này.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              Xác nhận xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

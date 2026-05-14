@@ -39,6 +39,7 @@ export class ProductsService {
         categoryId: createProductDto.categoryId,
         sku: createProductDto.sku || 'SKU-' + Date.now().toString().slice(-6),
         isActive: createProductDto.status === 'active',
+        attributes: createProductDto.attributes || [],
         images: {
           create: imagesData
         },
@@ -140,6 +141,7 @@ export class ProductsService {
         categoryId: updateProductDto.categoryId,
         sku: updateProductDto.sku,
         isActive: updateProductDto.status === 'active',
+        attributes: updateProductDto.attributes || [],
         images: {
           deleteMany: {},
           create: imagesData

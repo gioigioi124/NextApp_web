@@ -16,10 +16,10 @@ export declare class ProductsController {
             variants: {
                 id: string;
                 name: string;
+                image: string | null;
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
-                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];
@@ -28,6 +28,8 @@ export declare class ProductsController {
             name: string;
             slug: string;
             description: string;
+            createdAt: Date;
+            updatedAt: Date;
             price: import("@prisma/client/runtime/library").Decimal;
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
@@ -35,14 +37,23 @@ export declare class ProductsController {
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
-            createdAt: Date;
-            updatedAt: Date;
+            attributes: import("@prisma/client/runtime/library").JsonValue | null;
             categoryId: string;
         };
         message: string;
     }>;
     findAll(page?: number, limit?: number, search?: string, categoryId?: string): Promise<{
         data: ({
+            category: {
+                id: string;
+                name: string;
+                slug: string;
+                description: string | null;
+                image: string | null;
+                parentId: string | null;
+                createdAt: Date;
+                updatedAt: Date;
+            };
             images: {
                 id: string;
                 url: string;
@@ -50,23 +61,13 @@ export declare class ProductsController {
                 position: number;
                 productId: string;
             }[];
-            category: {
-                id: string;
-                name: string;
-                slug: string;
-                description: string | null;
-                createdAt: Date;
-                updatedAt: Date;
-                image: string | null;
-                parentId: string | null;
-            };
             variants: {
                 id: string;
                 name: string;
+                image: string | null;
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
-                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];
@@ -75,6 +76,8 @@ export declare class ProductsController {
             name: string;
             slug: string;
             description: string;
+            createdAt: Date;
+            updatedAt: Date;
             price: import("@prisma/client/runtime/library").Decimal;
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
@@ -82,8 +85,7 @@ export declare class ProductsController {
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
-            createdAt: Date;
-            updatedAt: Date;
+            attributes: import("@prisma/client/runtime/library").JsonValue | null;
             categoryId: string;
         })[];
         meta: {
@@ -95,6 +97,16 @@ export declare class ProductsController {
     }>;
     findOne(id: string): Promise<{
         data: {
+            category: {
+                id: string;
+                name: string;
+                slug: string;
+                description: string | null;
+                image: string | null;
+                parentId: string | null;
+                createdAt: Date;
+                updatedAt: Date;
+            };
             images: {
                 id: string;
                 url: string;
@@ -102,23 +114,13 @@ export declare class ProductsController {
                 position: number;
                 productId: string;
             }[];
-            category: {
-                id: string;
-                name: string;
-                slug: string;
-                description: string | null;
-                createdAt: Date;
-                updatedAt: Date;
-                image: string | null;
-                parentId: string | null;
-            };
             variants: {
                 id: string;
                 name: string;
+                image: string | null;
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
-                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];
@@ -127,6 +129,8 @@ export declare class ProductsController {
             name: string;
             slug: string;
             description: string;
+            createdAt: Date;
+            updatedAt: Date;
             price: import("@prisma/client/runtime/library").Decimal;
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
@@ -134,8 +138,7 @@ export declare class ProductsController {
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
-            createdAt: Date;
-            updatedAt: Date;
+            attributes: import("@prisma/client/runtime/library").JsonValue | null;
             categoryId: string;
         };
     }>;
@@ -151,10 +154,10 @@ export declare class ProductsController {
             variants: {
                 id: string;
                 name: string;
+                image: string | null;
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
-                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];
@@ -163,6 +166,8 @@ export declare class ProductsController {
             name: string;
             slug: string;
             description: string;
+            createdAt: Date;
+            updatedAt: Date;
             price: import("@prisma/client/runtime/library").Decimal;
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             sku: string;
@@ -170,8 +175,7 @@ export declare class ProductsController {
             isActive: boolean;
             isFeatured: boolean;
             tags: string[];
-            createdAt: Date;
-            updatedAt: Date;
+            attributes: import("@prisma/client/runtime/library").JsonValue | null;
             categoryId: string;
         };
         message: string;
