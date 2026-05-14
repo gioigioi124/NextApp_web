@@ -1,25 +1,32 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Download } from "lucide-react";
+import { Plus } from "lucide-react";
 import { DataTable } from "./data-table";
 import { columns, Product } from "./columns";
+import { ProductFilters } from "./product-filters";
+import { Pagination } from "@/components/ui/pagination";
 
-async function getProducts(): Promise<Product[]> {
+async function getProducts(params: { page?: string; search?: string; categoryId?: string }): Promise<{ data: Product[], meta: any }> {
   try {
-    const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/products`, {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/products?${query}`, {
       cache: 'no-store'
     });
     if (!res.ok) throw new Error('Failed to fetch products');
-    const json = await res.json();
-    return json.data;
+    return res.json();
   } catch (error) {
     console.error("Fetch products error:", error);
-    return [];
+    return { data: [], meta: { total: 0, page: 1, totalPages: 0 } };
   }
 }
 
-export default async function AdminProductsPage() {
-  const data = await getProducts();
+export default async function AdminProductsPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ page?: string; search?: string; categoryId?: string }> 
+}) {
+  const params = await searchParams;
+  const { data, meta } = await getProducts(params);
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -41,37 +48,12 @@ export default async function AdminProductsPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-8 flex flex-wrap gap-4 items-center">
-          <div className="relative flex-1 min-w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <input 
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
-              placeholder="Tìm kiếm tên sản phẩm..." 
-              type="text"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <select className="bg-card border border-border rounded-lg px-4 py-2.5 text-foreground outline-none">
-              <option value="">Tất cả danh mục</option>
-              <option value="chan">Chăn</option>
-              <option value="ga">Ga giường</option>
-            </select>
-          </div>
-        </div>
-        <div className="md:col-span-4 flex justify-end items-center gap-4">
-          <Button variant="outline" className="gap-2">
-            <Filter className="w-4 h-4" />
-            Bộ lọc
-          </Button>
-          <Button variant="outline" className="gap-2">
-            <Download className="w-4 h-4" />
-            Xuất CSV
-          </Button>
-        </div>
-      </div>
+      <ProductFilters />
 
-      <DataTable columns={columns} data={data} />
+      <div className="space-y-4">
+        <DataTable columns={columns} data={data} />
+        <Pagination totalPages={meta.totalPages} currentPage={meta.page} />
+      </div>
     </div>
   );
 }

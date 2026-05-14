@@ -13,6 +13,7 @@ import { ArrowLeft, Info, Layers, Image as ImageIcon, Banknote, CloudUpload, Tra
 import Link from "next/link";
 import { productSchema, ProductInput } from "shared-utils";
 import { toast } from "sonner";
+import { TagInput } from "@/components/ui/tag-input";
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -20,11 +21,26 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // State for dynamic attributes
   const [attributes, setAttributes] = useState<{ name: string; values: string[] }[]>([]);
   const [variants, setVariants] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   // Use ref to read variants inside effects without adding it to dependency array
   const variantsRef = useRef<any[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`);
+        if (res.ok) {
+          const json = await res.json();
+          setCategories(json.data || []);
+        }
+      } catch (error) {
+        console.error("Fetch categories error:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const updateVariants = (newVal: any[]) => {
     variantsRef.current = newVal;
@@ -104,13 +120,15 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     if (isLoading) return;
 
-    if (attributes.length === 0) {
-      // Only clear if not already empty
+    // Filter out attributes that are empty (no name OR no values) to keep UX smooth
+    const activeAttrs = attributes.filter(a => a.name.trim() !== "" && a.values.length > 0);
+
+    if (activeAttrs.length === 0) {
       if (variantsRef.current.length > 0) {
         updateVariants([]);
+        setValue("variants", []);
       }
-      setValue("attributes", []);
-      setValue("variants", []);
+      setValue("attributes", attributes);
       return;
     }
 
@@ -123,11 +141,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           helper(arr, i + 1);
         }
       };
-      if (attrs.every(a => a.values.length > 0)) helper([], 0);
+      helper([], 0);
       return result;
     };
 
-    const combs = generateCombinations(attributes) || [];
+    const combs = generateCombinations(activeAttrs) || [];
     const currentVariants = variantsRef.current;
     const newVariants = combs.map((comb) => {
       const name = comb.map((c: any) => c.value).join(" - ");
@@ -144,11 +162,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
     const prevNames = JSON.stringify(currentVariants.map(v => v.name));
     const nextNames = JSON.stringify(newVariants.map(v => v.name));
+    
     if (prevNames !== nextNames) {
       updateVariants(newVariants);
+      setValue("variants", newVariants);
     }
     setValue("attributes", attributes);
-    setValue("variants", newVariants.length > 0 ? newVariants : currentVariants);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes, basePrice, isLoading, setValue]);
 
@@ -168,9 +187,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setAttributes(newAttrs);
   };
 
-  const updateAttributeValues = (index: number, valuesStr: string) => {
+  const updateAttributeValues = (index: number, values: string[]) => {
     const newAttrs = [...attributes];
-    newAttrs[index].values = valuesStr.split(",").map(v => v.trim()).filter(v => v !== "");
+    newAttrs[index].values = values;
     setAttributes(newAttrs);
   };
 
@@ -269,6 +288,28 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   <Textarea id="description" {...register("description")} placeholder="Mô tả chất liệu, đặc tính..." className="bg-input min-h-[150px] resize-none" />
                   {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="sku" className="text-xs font-semibold text-muted-foreground uppercase">MÃ SẢN PHẨM (SKU)</Label>
+                    <Input id="sku" {...register("sku")} placeholder="Ví dụ: PROD-001" className="bg-input h-12" />
+                    {errors.sku && <p className="text-sm text-destructive">{errors.sku.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase">DANH MỤC</Label>
+                    <Select value={watch("categoryId")} onValueChange={(v) => setValue('categoryId', v)}>
+                      <SelectTrigger className="h-12 bg-input">
+                        <SelectValue placeholder="Chọn danh mục" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.categoryId && <p className="text-sm text-destructive">{errors.categoryId.message}</p>}
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -293,7 +334,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   {attributes.map((attr, idx) => (
                     <div key={idx} className="flex gap-4 items-start bg-muted/30 p-4 rounded-lg border border-border">
                       <div className="space-y-2 flex-1">
-                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Tên thuộc tính</Label>
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Tên thuộc tính (vd: Kích thước)</Label>
                         <Input 
                           placeholder="Ví dụ: Kích thước" 
                           value={attr.name}
@@ -302,12 +343,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         />
                       </div>
                       <div className="space-y-2 flex-[2]">
-                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Các giá trị (cách nhau bởi dấu phẩy)</Label>
-                        <Input 
-                          placeholder="Ví dụ: S, M, L" 
-                          value={attr.values.join(", ")}
-                          onChange={(e) => updateAttributeValues(idx, e.target.value)}
-                          className="bg-card h-10" 
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Các giá trị</Label>
+                        <TagInput
+                          values={attr.values}
+                          onChange={(vals) => updateAttributeValues(idx, vals)}
+                          placeholder="Nhập giá trị rồi nhấn Enter..."
                         />
                       </div>
                       <Button variant="ghost" size="icon" type="button" className="mt-6 text-destructive hover:bg-destructive/10" onClick={() => handleRemoveAttribute(idx)}>
@@ -322,6 +362,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         <thead className="bg-muted text-muted-foreground text-xs uppercase font-semibold border-b border-border">
                           <tr>
                             <th className="px-4 py-3">Biến thể</th>
+                            <th className="px-4 py-3 w-40">Ảnh</th>
                             <th className="px-4 py-3">Giá</th>
                             <th className="px-4 py-3">Tồn kho</th>
                             <th className="px-4 py-3">SKU</th>
@@ -331,6 +372,23 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                           {variants.map((variant, idx) => (
                             <tr key={idx} className="bg-card hover:bg-muted/30">
                               <td className="px-4 py-3 font-medium text-foreground">{variant.name}</td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 shrink-0 rounded border border-border bg-muted flex items-center justify-center overflow-hidden">
+                                    {variant.image ? (
+                                      <img src={variant.image} alt={variant.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                      <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                    )}
+                                  </div>
+                                  <Input 
+                                    className="h-8 text-[10px] min-w-[80px]" 
+                                    placeholder="URL ảnh" 
+                                    value={variant.image || ""} 
+                                    onChange={(e) => handleVariantChange(idx, 'image', e.target.value)} 
+                                  />
+                                </div>
+                              </td>
                               <td className="px-4 py-3">
                                 <Input type="number" className="h-9" value={variant.price} onChange={(e) => handleVariantChange(idx, 'price', Number(e.target.value))} />
                               </td>

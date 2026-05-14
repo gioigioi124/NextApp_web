@@ -1,20 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import slugify from 'slugify';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createProductDto: any) {
-    const slug = createProductDto.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    const slug = slugify(createProductDto.name, { lower: true }) + '-' + Date.now().toString().slice(-4);
     
-    let category = await this.prisma.category.findFirst();
-    if (!category) {
-      category = await this.prisma.category.create({
-        data: { name: 'Chăn Ga Gối', slug: 'chan-ga-goi' }
-      });
+    // Check category existence
+    if (createProductDto.categoryId) {
+      const category = await this.prisma.category.findUnique({ where: { id: createProductDto.categoryId } });
+      if (!category) throw new NotFoundException('Danh mục không tồn tại');
     }
 
     const variantsData = createProductDto.variants?.map((v: any) => ({
@@ -22,18 +20,19 @@ export class ProductsService {
       sku: v.sku,
       price: v.price,
       stock: v.stock,
+      image: v.image,
       options: v.options
     })) || [];
 
     const product = await this.prisma.product.create({
       data: {
         name: createProductDto.name,
-        slug: slug + '-' + Date.now().toString().slice(-4),
+        slug: slug,
         description: createProductDto.description,
         price: createProductDto.price,
         stock: createProductDto.stock,
-        categoryId: category.id,
-        sku: 'SKU-' + Date.now().toString().slice(-6),
+        categoryId: createProductDto.categoryId,
+        sku: createProductDto.sku || 'SKU-' + Date.now().toString().slice(-6),
         isActive: createProductDto.status === 'active',
         variants: {
           create: variantsData
@@ -50,24 +49,47 @@ export class ProductsService {
     };
   }
 
-  async findAll() {
-    const products = await this.prisma.product.findMany({
-      include: {
-        category: true,
-        variants: true,
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+  async findAll(query: { page?: number; limit?: number; search?: string; categoryId?: string }) {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const search = query.search || '';
+    const categoryId = query.categoryId;
+
+    const where: any = {
+      OR: [
+        { name: { contains: search, mode: 'insensitive' } },
+        { sku: { contains: search, mode: 'insensitive' } },
+      ],
+    };
+
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+          variants: true,
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.product.count({ where }),
+    ]);
 
     return {
       data: products,
       meta: {
-        total: products.length,
-        page: 1,
-        limit: products.length,
-        totalPages: 1
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
       }
     };
   }
@@ -77,19 +99,22 @@ export class ProductsService {
       where: { id },
       include: { category: true, variants: true, images: true }
     });
+    if (!product) throw new NotFoundException('Không tìm thấy sản phẩm');
     return { data: product };
   }
 
   async update(id: string, updateProductDto: any) {
+    await this.findOne(id);
+
     const variantsData = updateProductDto.variants?.map((v: any) => ({
       name: v.name,
       sku: v.sku,
       price: v.price,
       stock: v.stock,
+      image: v.image,
       options: v.options
     })) || [];
 
-    // Cập nhật sản phẩm cơ bản và ghi đè toàn bộ biến thể
     const product = await this.prisma.product.update({
       where: { id },
       data: {
@@ -98,6 +123,7 @@ export class ProductsService {
         price: updateProductDto.price,
         stock: updateProductDto.stock,
         categoryId: updateProductDto.categoryId,
+        sku: updateProductDto.sku,
         isActive: updateProductDto.status === 'active',
         variants: {
           deleteMany: {},
@@ -112,7 +138,7 @@ export class ProductsService {
   }
 
   async remove(id: string) {
-    // Delete product.
+    await this.findOne(id);
     await this.prisma.product.delete({
       where: { id }
     });

@@ -28,10 +28,19 @@ export const productSchema = z.object({
     sku: z.string(),
     price: z.coerce.number(),
     stock: z.coerce.number(),
+    image: z.string().optional(),
     options: z.any()
   })).optional(),
+});
+
+export const categorySchema = z.object({
+  name: z.string().min(2, 'Tên danh mục tối thiểu 2 ký tự'),
+  description: z.string().optional(),
+  image: z.string().optional(),
+  parentId: z.string().optional().nullable(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ProductInput = z.infer<typeof productSchema>;
+export type CategoryInput = z.infer<typeof categorySchema>;

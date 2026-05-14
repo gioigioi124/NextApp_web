@@ -12,6 +12,7 @@ export declare class ProductsController {
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
+                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];
@@ -33,7 +34,7 @@ export declare class ProductsController {
         };
         message: string;
     }>;
-    findAll(): Promise<{
+    findAll(page?: number, limit?: number, search?: string, categoryId?: string): Promise<{
         data: ({
             category: {
                 id: string;
@@ -51,6 +52,7 @@ export declare class ProductsController {
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
+                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];
@@ -78,7 +80,7 @@ export declare class ProductsController {
         };
     }>;
     findOne(id: string): Promise<{
-        data: ({
+        data: {
             images: {
                 id: string;
                 productId: string;
@@ -102,6 +104,7 @@ export declare class ProductsController {
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
+                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];
@@ -120,7 +123,7 @@ export declare class ProductsController {
             createdAt: Date;
             updatedAt: Date;
             categoryId: string;
-        }) | null;
+        };
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         data: {
@@ -130,6 +133,7 @@ export declare class ProductsController {
                 price: import("@prisma/client/runtime/library").Decimal;
                 sku: string;
                 stock: number;
+                image: string | null;
                 options: import("@prisma/client/runtime/library").JsonValue;
                 productId: string;
             }[];

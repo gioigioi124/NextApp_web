@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { ArrowLeft, Info, Layers, Image as ImageIcon, Banknote, CloudUpload, Tra
 import Link from "next/link";
 import { productSchema, ProductInput } from "shared-utils";
 import { toast } from "sonner";
+import { TagInput } from "@/components/ui/tag-input";
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -21,6 +22,28 @@ export default function CreateProductPage() {
   // State for dynamic attributes
   const [attributes, setAttributes] = useState<{ name: string; values: string[] }[]>([]);
   const [variants, setVariants] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const variantsRef = useRef<any[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`);
+        if (res.ok) {
+          const json = await res.json();
+          setCategories(json.data || []);
+        }
+      } catch (error) {
+        console.error("Fetch categories error:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const updateVariants = (newVal: any[]) => {
+    variantsRef.current = newVal;
+    setVariants(newVal);
+  };
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
@@ -40,10 +63,15 @@ export default function CreateProductPage() {
 
   // Generate Cartesian Product of all attributes
   useEffect(() => {
-    if (attributes.length === 0) {
-      setVariants([]);
-      setValue("attributes", []);
-      setValue("variants", []);
+    // Filter out attributes that are empty (no name AND no values) to keep UX smooth
+    const activeAttrs = attributes.filter(a => a.name.trim() !== "" && a.values.length > 0);
+
+    if (activeAttrs.length === 0) {
+      if (variantsRef.current.length > 0) {
+        updateVariants([]);
+        setValue("variants", []);
+      }
+      setValue("attributes", attributes);
       return;
     }
 
@@ -59,14 +87,12 @@ export default function CreateProductPage() {
           helper(arr, i + 1);
         }
       };
-      // Only generate if there are values
-      if (attrs.every(a => a.values.length > 0)) {
-        helper([], 0);
-      }
+      helper([], 0);
       return result;
     };
 
-    const combs = generateCombinations(attributes);
+    const combs = generateCombinations(activeAttrs);
+    const currentVariants = variantsRef.current;
     const newVariants = combs.map((comb) => {
       const name = comb.map((c: any) => c.value).join(" - ");
       const options = comb.reduce((acc: any, curr: any) => {
@@ -74,21 +100,25 @@ export default function CreateProductPage() {
         return acc;
       }, {});
       
-      // Find existing variant to keep user input
-      const existing = variants.find(v => v.name === name);
+      const existing = currentVariants.find(v => v.name === name);
       return {
         name,
         options,
-        price: existing?.price || basePrice || 0,
-        stock: existing?.stock || 0,
+        price: existing?.price ?? basePrice ?? 0,
+        stock: existing?.stock ?? 0,
         sku: existing?.sku || `SKU-${Date.now().toString().slice(-4)}-${Math.floor(Math.random()*1000)}`
       };
     });
     
-    setVariants(newVariants);
+    const prevNames = JSON.stringify(currentVariants.map(v => v.name));
+    const nextNames = JSON.stringify(newVariants.map(v => v.name));
+
+    if (prevNames !== nextNames) {
+      updateVariants(newVariants);
+      setValue("variants", newVariants);
+    }
     setValue("attributes", attributes);
-    setValue("variants", newVariants);
-  }, [attributes, basePrice]);
+  }, [attributes, basePrice, setValue]);
 
   const handleAddAttribute = () => {
     setAttributes([...attributes, { name: "", values: [] }]);
@@ -106,16 +136,16 @@ export default function CreateProductPage() {
     setAttributes(newAttrs);
   };
 
-  const updateAttributeValues = (index: number, valuesStr: string) => {
+  const updateAttributeValues = (index: number, values: string[]) => {
     const newAttrs = [...attributes];
-    newAttrs[index].values = valuesStr.split(",").map(v => v.trim()).filter(v => v !== "");
+    newAttrs[index].values = values;
     setAttributes(newAttrs);
   };
 
   const handleVariantChange = (index: number, field: string, value: string | number) => {
-    const newVariants = [...variants];
+    const newVariants = [...variantsRef.current];
     newVariants[index] = { ...newVariants[index], [field]: value };
-    setVariants(newVariants);
+    updateVariants(newVariants);
     setValue("variants", newVariants);
   };
 
@@ -185,6 +215,28 @@ export default function CreateProductPage() {
                   <Textarea id="description" {...register("description")} placeholder="Mô tả chất liệu, đặc tính..." className="bg-input min-h-[150px] resize-none" />
                   {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="sku" className="text-xs font-semibold text-muted-foreground uppercase">MÃ SẢN PHẨM (SKU)</Label>
+                    <Input id="sku" {...register("sku")} placeholder="Ví dụ: PROD-001" className="bg-input h-12" />
+                    {errors.sku && <p className="text-sm text-destructive">{errors.sku.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase">DANH MỤC</Label>
+                    <Select onValueChange={(v) => setValue('categoryId', v)}>
+                      <SelectTrigger className="h-12 bg-input">
+                        <SelectValue placeholder="Chọn danh mục" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.categoryId && <p className="text-sm text-destructive">{errors.categoryId.message}</p>}
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -209,7 +261,7 @@ export default function CreateProductPage() {
                   {attributes.map((attr, idx) => (
                     <div key={idx} className="flex gap-4 items-start bg-muted/30 p-4 rounded-lg border border-border">
                       <div className="space-y-2 flex-1">
-                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Tên thuộc tính</Label>
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Tên thuộc tính (vd: Kích thước)</Label>
                         <Input 
                           placeholder="Ví dụ: Kích thước" 
                           value={attr.name}
@@ -218,12 +270,11 @@ export default function CreateProductPage() {
                         />
                       </div>
                       <div className="space-y-2 flex-[2]">
-                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Các giá trị (cách nhau bởi dấu phẩy)</Label>
-                        <Input 
-                          placeholder="Ví dụ: S, M, L" 
-                          value={attr.values.join(", ")}
-                          onChange={(e) => updateAttributeValues(idx, e.target.value)}
-                          className="bg-card h-10" 
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase">Các giá trị</Label>
+                        <TagInput
+                          values={attr.values}
+                          onChange={(vals) => updateAttributeValues(idx, vals)}
+                          placeholder="Nhập giá trị rồi nhấn Enter..."
                         />
                       </div>
                       <Button variant="ghost" size="icon" type="button" className="mt-6 text-destructive hover:bg-destructive/10" onClick={() => handleRemoveAttribute(idx)}>
@@ -238,6 +289,7 @@ export default function CreateProductPage() {
                         <thead className="bg-muted text-muted-foreground text-xs uppercase font-semibold border-b border-border">
                           <tr>
                             <th className="px-4 py-3">Biến thể</th>
+                            <th className="px-4 py-3 w-40">Ảnh</th>
                             <th className="px-4 py-3">Giá</th>
                             <th className="px-4 py-3">Tồn kho</th>
                             <th className="px-4 py-3">SKU</th>
@@ -247,6 +299,23 @@ export default function CreateProductPage() {
                           {variants.map((variant, idx) => (
                             <tr key={idx} className="bg-card hover:bg-muted/30">
                               <td className="px-4 py-3 font-medium text-foreground">{variant.name}</td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 shrink-0 rounded border border-border bg-muted flex items-center justify-center overflow-hidden">
+                                    {variant.image ? (
+                                      <img src={variant.image} alt={variant.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                      <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                    )}
+                                  </div>
+                                  <Input 
+                                    className="h-8 text-[10px] min-w-[80px]" 
+                                    placeholder="URL ảnh" 
+                                    value={variant.image || ""} 
+                                    onChange={(e) => handleVariantChange(idx, 'image', e.target.value)} 
+                                  />
+                                </div>
+                              </td>
                               <td className="px-4 py-3">
                                 <Input type="number" className="h-9" value={variant.price} onChange={(e) => handleVariantChange(idx, 'price', Number(e.target.value))} />
                               </td>
@@ -285,23 +354,38 @@ export default function CreateProductPage() {
             <section className="bg-card p-6 rounded-xl border border-border space-y-6">
               <div className="flex items-center gap-2 mb-2">
                 <Banknote className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-foreground">Giá & Kho (Cơ bản)</h2>
+                <h2 className="text-xl font-bold text-foreground">
+                  {variants.length > 0 ? "Giá tham chiếu" : "Giá & Kho"}
+                </h2>
               </div>
-              
+
+              {variants.length > 0 && (
+                <div className="text-xs text-muted-foreground bg-muted/60 border border-border rounded-lg px-3 py-2">
+                  ⚡ Sản phẩm có biến thể — giá và tồn kho thực tế được quản lý riêng theo từng biến thể bên trái.
+                  Giá dưới dùng làm giá mặc định cho biến thể mới sinh ra.
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase">GIÁ BÁN GỐC</Label>
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase">
+                    {variants.length > 0 ? "GIÁ MẶC ĐọNH BIẾN THỂ" : "GIÁ BÁN GỐC"}
+                  </Label>
                   <div className="relative">
                     <Input type="number" {...register("price")} className="bg-input h-12 pr-12 text-primary font-bold" placeholder="0" />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">₫</span>
                   </div>
                   {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase">TỔNG TỒN KHO</Label>
-                  <Input type="number" {...register("stock")} className="bg-input h-12" placeholder="0" />
-                  {errors.stock && <p className="text-sm text-destructive">{errors.stock.message}</p>}
-                </div>
+
+                {variants.length === 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase">TỔNG TỒN KHO</Label>
+                    <Input type="number" {...register("stock")} className="bg-input h-12" placeholder="0" />
+                    {errors.stock && <p className="text-sm text-destructive">{errors.stock.message}</p>}
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-muted-foreground uppercase">TRẠNG THÁI</Label>
                   <Select defaultValue="active" onValueChange={(v) => setValue('status', v as "active" | "draft" | "out")}>

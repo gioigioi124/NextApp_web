@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-40 text-center text-muted-foreground">
-                Chưa có sản phẩm nào.
+                Không có dữ liệu hiển thị.
               </TableCell>
             </TableRow>
           )}

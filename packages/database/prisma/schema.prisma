@@ -103,6 +103,7 @@ model ProductVariant {
   sku       String  @unique
   price     Decimal @db.Decimal(12, 2)
   stock     Int     @default(0)
+  image     String? // URL of the variant-specific image
   options   Json    // { color: "red", size: "XL" }
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
