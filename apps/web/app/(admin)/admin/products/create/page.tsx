@@ -233,7 +233,7 @@ export default function CreateProductPage() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-muted-foreground uppercase">DANH MỤC</Label>
-                    <Select onValueChange={(v) => setValue('categoryId', v)}>
+                    <Select onValueChange={(v) => setValue('categoryId', String(v))}>
                       <SelectTrigger className="h-12 bg-input">
                         <SelectValue placeholder="Chọn danh mục" />
                       </SelectTrigger>

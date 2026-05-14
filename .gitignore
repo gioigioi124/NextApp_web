@@ -1,2 +1,17 @@
 node_modules
+.pnpm-store
 stitch_admin
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Build outputs
+.next
+dist
+coverage
+
+# Runtime uploads
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep

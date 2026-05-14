@@ -318,7 +318,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-muted-foreground uppercase">DANH MỤC</Label>
-                    <Select value={watch("categoryId")} onValueChange={(v) => setValue('categoryId', v)}>
+                    <Select value={watch("categoryId") ?? undefined} onValueChange={(v) => setValue('categoryId', String(v))}>
                       <SelectTrigger className="h-12 bg-input">
                         <SelectValue placeholder="Chọn danh mục" />
                       </SelectTrigger>

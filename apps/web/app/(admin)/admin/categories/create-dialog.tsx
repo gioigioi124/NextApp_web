@@ -38,7 +38,7 @@ export function CreateCategoryDialog({ categories }: CreateCategoryDialogProps) 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<CategoryInput>({
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<CategoryInput>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: "",
@@ -95,7 +95,7 @@ export function CreateCategoryDialog({ categories }: CreateCategoryDialogProps) 
 
           <div className="space-y-2">
             <Label htmlFor="parentId" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Danh mục cha (Tùy chọn)</Label>
-            <Select onValueChange={(val) => setValue("parentId", val === "none" ? null : val)}>
+            <Select onValueChange={(val) => setValue("parentId", val === "none" ? null : String(val))}>
               <SelectTrigger className="bg-muted/50 border-border h-11">
                 <SelectValue placeholder="Chọn danh mục cha" />
               </SelectTrigger>

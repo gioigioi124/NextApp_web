@@ -6,6 +6,8 @@ import { columns, Product } from "./columns";
 import { ProductFilters } from "./product-filters";
 import { Pagination } from "@/components/ui/pagination";
 
+export const dynamic = "force-dynamic";
+
 async function getProducts(params: { page?: string; search?: string; categoryId?: string }): Promise<{ data: Product[], meta: any }> {
   try {
     const query = new URLSearchParams(params).toString();

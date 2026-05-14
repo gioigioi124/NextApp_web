@@ -4,6 +4,8 @@ import { DataTable } from "../products/data-table";
 import { columns, Category } from "./columns";
 import { CreateCategoryDialog } from "./create-dialog";
 
+export const dynamic = "force-dynamic";
+
 async function getCategories(): Promise<Category[]> {
   try {
     const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/categories`, {

@@ -103,7 +103,7 @@ export function EditCategoryDialog({ category, categories, open, onOpenChange }:
             <Label htmlFor="parentId" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Danh mục cha (Tùy chọn)</Label>
             <Select 
               defaultValue={category.parentId || "none"} 
-              onValueChange={(val) => setValue("parentId", val === "none" ? null : val)}
+              onValueChange={(val) => setValue("parentId", val === "none" ? null : String(val))}
             >
               <SelectTrigger className="bg-muted/50 border-border h-11">
                 <SelectValue placeholder="Chọn danh mục cha" />
