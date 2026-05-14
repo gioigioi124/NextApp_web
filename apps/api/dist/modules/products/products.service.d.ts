@@ -4,6 +4,13 @@ export declare class ProductsService {
     constructor(prisma: PrismaService);
     create(createProductDto: any): Promise<{
         data: {
+            images: {
+                id: string;
+                url: string;
+                alt: string | null;
+                position: number;
+                productId: string;
+            }[];
             variants: {
                 id: string;
                 name: string;
@@ -39,6 +46,13 @@ export declare class ProductsService {
         categoryId?: string;
     }): Promise<{
         data: ({
+            images: {
+                id: string;
+                url: string;
+                alt: string | null;
+                position: number;
+                productId: string;
+            }[];
             category: {
                 id: string;
                 name: string;
@@ -86,10 +100,10 @@ export declare class ProductsService {
         data: {
             images: {
                 id: string;
-                productId: string;
                 url: string;
                 alt: string | null;
                 position: number;
+                productId: string;
             }[];
             category: {
                 id: string;
@@ -130,6 +144,13 @@ export declare class ProductsService {
     }>;
     update(id: string, updateProductDto: any): Promise<{
         data: {
+            images: {
+                id: string;
+                url: string;
+                alt: string | null;
+                position: number;
+                productId: string;
+            }[];
             variants: {
                 id: string;
                 name: string;

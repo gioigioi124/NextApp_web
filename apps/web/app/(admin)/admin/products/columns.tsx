@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Edit, Copy, Trash2, Loader2 } from "lucide-react";
+import { MoreHorizontal, Edit, Copy, Trash2, Loader2, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -85,9 +85,14 @@ export const columns: ColumnDef<Product>[] = [
       const product = row.original;
       return (
         <div className="flex items-center gap-4">
-          <div className="w-16 h-12 rounded-lg bg-muted overflow-hidden flex-shrink-0">
-            {/* Using div as placeholder for image */}
-            <div className="w-full h-full bg-slate-200" />
+          <div className="w-16 h-12 rounded-lg bg-muted overflow-hidden flex-shrink-0 border border-border">
+            {product.images && product.images.length > 0 ? (
+              <img src={product.images[0].url} alt={product.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+                <ImageIcon className="w-4 h-4 text-muted-foreground" />
+              </div>
+            )}
           </div>
           <div>
             <div className="font-medium text-foreground">{product.name}</div>

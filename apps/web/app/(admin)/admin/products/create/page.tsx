@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Info, Layers, Image as ImageIcon, Banknote, CloudUpload, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Info, Layers, Image as ImageIcon, Banknote, CloudUpload, Trash2, Plus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { productSchema, ProductInput } from "shared-utils";
 import { toast } from "sonner";
 import { TagInput } from "@/components/ui/tag-input";
+import { ImageUpload } from "@/components/product/image-upload";
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -157,7 +158,15 @@ export default function CreateProductPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          attributes: attributes.filter(a => a.name.trim() !== "" && a.values.length > 0),
+          variants: variants.map(v => ({
+            ...v,
+            price: Number(v.price),
+            stock: Number(v.stock)
+          }))
+        })
       });
       
       if (!res.ok) {
@@ -301,7 +310,35 @@ export default function CreateProductPage() {
                               <td className="px-4 py-3 font-medium text-foreground">{variant.name}</td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-8 h-8 shrink-0 rounded border border-border bg-muted flex items-center justify-center overflow-hidden">
+                                  <div 
+                                    className="w-8 h-8 shrink-0 rounded border border-border bg-muted flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary/50 transition-colors"
+                                    onClick={() => {
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.onchange = async (e: any) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const formData = new FormData();
+                                          formData.append('file', file);
+                                          try {
+                                            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/upload`, {
+                                              method: 'POST',
+                                              body: formData
+                                            });
+                                            if (res.ok) {
+                                              const data = await res.json();
+                                              handleVariantChange(idx, 'image', data.url);
+                                              toast.success("Đã tải ảnh biến thể");
+                                            }
+                                          } catch (err) {
+                                            toast.error("Lỗi khi tải ảnh");
+                                          }
+                                        }
+                                      };
+                                      input.click();
+                                    }}
+                                  >
                                     {variant.image ? (
                                       <img src={variant.image} alt={variant.name} className="w-full h-full object-cover" />
                                     ) : (
@@ -341,14 +378,17 @@ export default function CreateProductPage() {
             <section className="bg-card p-6 rounded-xl border border-border space-y-6">
               <div className="flex items-center gap-2 mb-2">
                 <ImageIcon className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-foreground">Hình ảnh</h2>
+                <h2 className="text-xl font-bold text-foreground">Hình ảnh sản phẩm</h2>
               </div>
               
-              <div className="border-2 border-dashed border-border rounded-xl p-8 text-center bg-muted/50 hover:bg-muted transition-colors cursor-pointer">
-                <CloudUpload className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm font-medium text-foreground">Kéo thả hoặc nhấn để tải lên</p>
-                <p className="text-xs text-muted-foreground mt-1">PNG, JPG (Tối đa 5MB)</p>
-              </div>
+              <ImageUpload 
+                value={watch("images") || []} 
+                onChange={(urls) => setValue("images", urls)} 
+                maxFiles={10} 
+              />
+              <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest font-bold text-center">
+                Ảnh đầu tiên sẽ là ảnh đại diện
+              </p>
             </section>
 
             <section className="bg-card p-6 rounded-xl border border-border space-y-6">

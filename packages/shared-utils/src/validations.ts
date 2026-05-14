@@ -19,6 +19,8 @@ export const productSchema = z.object({
   stock: z.coerce.number().min(0, 'Tồn kho không hợp lệ'),
   categoryId: z.string().min(1, 'Vui lòng chọn danh mục'),
   status: z.enum(['active', 'draft', 'out']),
+  sku: z.string().optional(),
+  images: z.array(z.string()).optional(),
   attributes: z.array(z.object({
     name: z.string(),
     values: z.array(z.string())

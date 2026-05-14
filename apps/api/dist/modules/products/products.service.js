@@ -36,6 +36,10 @@ let ProductsService = class ProductsService {
             image: v.image,
             options: v.options
         })) || [];
+        const imagesData = createProductDto.images?.map((url, index) => ({
+            url,
+            position: index,
+        })) || [];
         const product = await this.prisma.product.create({
             data: {
                 name: createProductDto.name,
@@ -46,12 +50,16 @@ let ProductsService = class ProductsService {
                 categoryId: createProductDto.categoryId,
                 sku: createProductDto.sku || 'SKU-' + Date.now().toString().slice(-6),
                 isActive: createProductDto.status === 'active',
+                images: {
+                    create: imagesData
+                },
                 variants: {
                     create: variantsData
                 }
             },
             include: {
-                variants: true
+                variants: true,
+                images: true
             }
         });
         return {
@@ -80,6 +88,7 @@ let ProductsService = class ProductsService {
                 include: {
                     category: true,
                     variants: true,
+                    images: true,
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -118,6 +127,10 @@ let ProductsService = class ProductsService {
             image: v.image,
             options: v.options
         })) || [];
+        const imagesData = updateProductDto.images?.map((url, index) => ({
+            url,
+            position: index,
+        })) || [];
         const product = await this.prisma.product.update({
             where: { id },
             data: {
@@ -128,13 +141,18 @@ let ProductsService = class ProductsService {
                 categoryId: updateProductDto.categoryId,
                 sku: updateProductDto.sku,
                 isActive: updateProductDto.status === 'active',
+                images: {
+                    deleteMany: {},
+                    create: imagesData
+                },
                 variants: {
                     deleteMany: {},
                     create: variantsData
                 }
             },
             include: {
-                variants: true
+                variants: true,
+                images: true
             }
         });
         return { data: product, message: "Cập nhật thành công" };

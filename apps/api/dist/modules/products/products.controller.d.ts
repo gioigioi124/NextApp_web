@@ -6,6 +6,13 @@ export declare class ProductsController {
     constructor(productsService: ProductsService);
     create(createProductDto: CreateProductDto): Promise<{
         data: {
+            images: {
+                id: string;
+                url: string;
+                alt: string | null;
+                position: number;
+                productId: string;
+            }[];
             variants: {
                 id: string;
                 name: string;
@@ -36,6 +43,13 @@ export declare class ProductsController {
     }>;
     findAll(page?: number, limit?: number, search?: string, categoryId?: string): Promise<{
         data: ({
+            images: {
+                id: string;
+                url: string;
+                alt: string | null;
+                position: number;
+                productId: string;
+            }[];
             category: {
                 id: string;
                 name: string;
@@ -83,10 +97,10 @@ export declare class ProductsController {
         data: {
             images: {
                 id: string;
-                productId: string;
                 url: string;
                 alt: string | null;
                 position: number;
+                productId: string;
             }[];
             category: {
                 id: string;
@@ -127,6 +141,13 @@ export declare class ProductsController {
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         data: {
+            images: {
+                id: string;
+                url: string;
+                alt: string | null;
+                position: number;
+                productId: string;
+            }[];
             variants: {
                 id: string;
                 name: string;
