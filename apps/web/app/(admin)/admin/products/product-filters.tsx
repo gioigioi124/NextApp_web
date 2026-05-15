@@ -5,6 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Search, Filter, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/use-debounce";
+import { getClientAuthHeaders } from "@/lib/auth-headers";
 
 interface Category {
   id: string;
@@ -23,7 +24,9 @@ export function ProductFilters() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`, {
+          headers: getClientAuthHeaders(),
+        });
         if (res.ok) {
           const json = await res.json();
           setCategories(json.data || []);

@@ -57,3 +57,8 @@ export interface AuthResponse {
   user: User;
   tokens: AuthTokens;
 }
+
+export interface ApiAuthResponse {
+  data: AuthResponse;
+  message?: string;
+}

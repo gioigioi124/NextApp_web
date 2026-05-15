@@ -12,6 +12,13 @@ export const registerSchema = z.object({
   phone: z.string().optional(),
 });
 
+export const registerFormSchema = registerSchema.extend({
+  confirmPassword: z.string().min(6, 'Mat khau toi thieu 6 ky tu'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Mat khau xac nhan khong khop',
+  path: ['confirmPassword'],
+});
+
 export const productSchema = z.object({
   name: z.string().min(3, 'Tên sản phẩm tối thiểu 3 ký tự'),
   description: z.string().min(10, 'Mô tả tối thiểu 10 ký tự'),
@@ -44,5 +51,6 @@ export const categorySchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type RegisterFormInput = z.infer<typeof registerFormSchema>;
 export type ProductInput = z.infer<typeof productSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;

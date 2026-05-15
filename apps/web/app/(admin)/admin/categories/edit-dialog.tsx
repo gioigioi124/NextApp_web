@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Pencil, Loader2 } from "lucide-react";
 import { Category } from "./columns";
+import { getClientAuthHeaders } from "@/lib/auth-headers";
 
 interface EditCategoryDialogProps {
   category: Category;
@@ -64,7 +65,7 @@ export function EditCategoryDialog({ category, categories, open, onOpenChange }:
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories/${category.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getClientAuthHeaders() },
         body: JSON.stringify(data),
       });
 

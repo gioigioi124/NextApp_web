@@ -9,6 +9,7 @@ stitch_admin
 
 # Build outputs
 .next
+.turbo
 dist
 coverage
 

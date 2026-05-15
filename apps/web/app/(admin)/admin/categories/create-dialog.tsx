@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, Loader2 } from "lucide-react";
 import { Category } from "./columns";
+import { getClientAuthHeaders } from "@/lib/auth-headers";
 
 interface CreateCategoryDialogProps {
   categories: Category[];
@@ -52,7 +53,7 @@ export function CreateCategoryDialog({ categories }: CreateCategoryDialogProps) 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getClientAuthHeaders() },
         body: JSON.stringify(data),
       });
 

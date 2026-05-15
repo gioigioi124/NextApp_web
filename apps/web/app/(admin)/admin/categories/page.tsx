@@ -3,13 +3,16 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "../products/data-table";
 import { columns, Category } from "./columns";
 import { CreateCategoryDialog } from "./create-dialog";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 async function getCategories(): Promise<Category[]> {
   try {
+    const token = (await cookies()).get("auth-token")?.value;
     const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/categories`, {
-      cache: 'no-store'
+      cache: 'no-store',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) throw new Error('Failed to fetch categories');
     const json = await res.json();

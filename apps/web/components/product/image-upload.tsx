@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { CloudUpload, X, Loader2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { getClientAuthHeaders } from "@/lib/auth-headers";
 
 interface ImageUploadProps {
   value: string[];
@@ -30,6 +31,7 @@ export function ImageUpload({ value, onChange, maxFiles = 5 }: ImageUploadProps)
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/upload`, {
           method: "POST",
+          headers: getClientAuthHeaders(),
           body: formData,
         });
 

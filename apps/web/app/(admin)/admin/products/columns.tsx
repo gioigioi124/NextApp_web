@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getClientAuthHeaders } from "@/lib/auth-headers";
 
 export type Product = {
   id: string;
@@ -50,6 +51,7 @@ const ProductActions = ({ product }: { product: Product }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${product.id}`, {
         method: "DELETE",
+        headers: getClientAuthHeaders(),
       });
 
       if (!res.ok) throw new Error("Xóa thất bại");

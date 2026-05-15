@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getClientAuthHeaders } from "@/lib/auth-headers";
 
 export type Category = {
   id: string;
@@ -108,7 +109,9 @@ function CategoryActions({ category }: { category: Category }) {
     if (showEdit) {
       const fetchAll = async () => {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`, {
+            headers: getClientAuthHeaders(),
+          });
           if (res.ok) {
             const json = await res.json();
             setAllCategories(json.data || []);
@@ -125,7 +128,8 @@ function CategoryActions({ category }: { category: Category }) {
     setIsDeleting(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories/${category.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getClientAuthHeaders(),
       });
       if (res.ok) {
         toast.success("Đã xóa danh mục thành công");
@@ -203,4 +207,3 @@ function CategoryActions({ category }: { category: Category }) {
     </>
   );
 }
-

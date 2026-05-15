@@ -5,14 +5,17 @@ import { DataTable } from "./data-table";
 import { columns, Product } from "./columns";
 import { ProductFilters } from "./product-filters";
 import { Pagination } from "@/components/ui/pagination";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 async function getProducts(params: { page?: string; search?: string; categoryId?: string }): Promise<{ data: Product[], meta: any }> {
   try {
+    const token = (await cookies()).get("auth-token")?.value;
     const query = new URLSearchParams(params).toString();
     const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/products?${query}`, {
-      cache: 'no-store'
+      cache: 'no-store',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) throw new Error('Failed to fetch products');
     return res.json();

@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProductsModule } from './modules/products/products.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -14,6 +15,7 @@ import { PrismaModule } from './prisma/prisma.module';
       envFilePath: '../../.env',
     }),
     PrismaModule,
+    AuthModule,
     CategoriesModule,
     ProductsModule,
     UploadModule,

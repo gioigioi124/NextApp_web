@@ -15,6 +15,7 @@ import { productSchema, ProductInput } from "shared-utils";
 import { toast } from "sonner";
 import { TagInput } from "@/components/ui/tag-input";
 import { ImageUpload } from "@/components/product/image-upload";
+import { getClientAuthHeaders } from "@/lib/auth-headers";
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -25,6 +26,15 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [attributes, setAttributes] = useState<{ name: string; values: string[] }[]>([]);
   const [variants, setVariants] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const categoryItems = categories.map((cat) => ({
+    value: cat.id,
+    label: cat.name,
+  }));
+  const statusItems = [
+    { value: "active", label: "Đang kinh doanh" },
+    { value: "draft", label: "Nháp" },
+    { value: "out", label: "Hết hàng" },
+  ];
   // Use ref to read variants inside effects without adding it to dependency array
   const variantsRef = useRef<any[]>([]);
   // Flag to prevent useEffect from clearing variants right after fetch
@@ -33,7 +43,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`, {
+          headers: getClientAuthHeaders(),
+        });
         if (res.ok) {
           const json = await res.json();
           setCategories(json.data || []);
@@ -57,7 +69,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       description: "",
       price: 0,
       stock: 0,
-      categoryId: "cm3ed",
+      categoryId: "",
       status: "active",
       attributes: [],
       variants: []
@@ -69,7 +81,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${id}`, {
+          headers: getClientAuthHeaders(),
+        });
         if (!res.ok) throw new Error("Failed to fetch");
         const json = await res.json();
         const product = json.data;
@@ -238,7 +252,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getClientAuthHeaders() },
         body: JSON.stringify(payload)
       });
       
@@ -318,7 +332,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-muted-foreground uppercase">DANH MỤC</Label>
-                    <Select value={watch("categoryId") ?? undefined} onValueChange={(v) => setValue('categoryId', String(v))}>
+                    <Select
+                      items={categoryItems}
+                      value={watch("categoryId") || null}
+                      onValueChange={(v) => setValue("categoryId", v ? String(v) : "", { shouldValidate: true })}
+                    >
                       <SelectTrigger className="h-12 bg-input">
                         <SelectValue placeholder="Chọn danh mục" />
                       </SelectTrigger>
@@ -409,6 +427,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                           try {
                                             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/upload`, {
                                               method: 'POST',
+                                              headers: getClientAuthHeaders(),
                                               body: formData
                                             });
                                             if (res.ok) {
@@ -498,7 +517,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-muted-foreground uppercase">TRẠNG THÁI</Label>
-                  <Select value={watch("status")} onValueChange={(v) => setValue('status', v as "active" | "draft" | "out")}>
+                  <Select
+                    items={statusItems}
+                    value={watch("status")}
+                    onValueChange={(v) => setValue('status', v as "active" | "draft" | "out")}
+                  >
                     <SelectTrigger className="h-12 bg-input">
                       <SelectValue placeholder="Chọn trạng thái" />
                     </SelectTrigger>

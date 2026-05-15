@@ -8,12 +8,16 @@ import {
   UploadedFile,
   BadRequestException,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { existsSync } from 'fs';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 // __dirname = ...apps/api/src/modules/upload (dev) or ...apps/api/dist/modules/upload (prod)
 // Go up 3 levels from src/modules/upload → apps/api, then into uploads
@@ -23,6 +27,8 @@ const UPLOADS_PATH = join(API_ROOT, 'uploads');
 @Controller('upload')
 export class UploadController {
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'STAFF')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
