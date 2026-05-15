@@ -9,13 +9,13 @@ const inter = Inter({
 });
 
 const playfair = Playfair_Display({
-  variable: "--font-heading",
+  variable: "--font-display",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: "Lumina Bedding",
-  description: "Premium Sleep Experience",
+  description: "Chăn ga, gối và nệm cao cấp cho giấc ngủ Việt.",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body
         className={`${inter.variable} ${playfair.variable} antialiased font-sans`}
       >

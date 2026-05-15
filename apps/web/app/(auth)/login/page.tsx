@@ -20,12 +20,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth-store";
+import { useCartStore } from "@/stores/cart-store";
 import { toast } from "sonner";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const syncWithServer = useCartStore((state) => state.syncWithServer);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -49,6 +51,7 @@ function LoginForm() {
       });
 
       setAuth(response.data.user, response.data.tokens);
+      await syncWithServer();
       toast.success("Dang nhap thanh cong");
       router.push(searchParams.get("next") || "/");
       router.refresh();

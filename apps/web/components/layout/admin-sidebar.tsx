@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Layers } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Layers, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/lib/api-client";
+import { useAuthStore } from "@/stores/auth-store";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Tổng quan", href: "/admin" },
@@ -14,6 +16,20 @@ const menuItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = async () => {
+    try {
+      await apiClient.fetch("/auth/logout", { method: "POST" });
+    } catch {
+      // Local logout still needs to happen if the token is already invalid.
+    }
+
+    logout();
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <aside className="w-64 bg-card h-screen border-r border-border hidden md:flex flex-col sticky top-0">
@@ -56,10 +72,21 @@ export function AdminSidebar() {
           <Settings className="w-5 h-5" />
           <span className="font-medium">Cài đặt</span>
         </Link>
+        <Link href="/profile" className={cn(
+          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200",
+          pathname === "/profile" && "bg-primary/10 text-primary font-semibold"
+        )}>
+          <User className="w-5 h-5" />
+          <span className="font-medium">Profile</span>
+        </Link>
       </div>
 
       <div className="p-4 border-t border-border">
-        <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+        >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Đăng xuất</span>
         </button>

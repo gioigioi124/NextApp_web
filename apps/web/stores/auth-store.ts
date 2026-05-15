@@ -10,6 +10,7 @@ interface AuthState {
   tokens: AuthTokens | null;
   isAuthenticated: boolean;
   setAuth: (user: User, tokens: AuthTokens) => void;
+  setUser: (user: User) => void;
   logout: () => void;
 }
 
@@ -33,6 +34,7 @@ export const useAuthStore = create<AuthState>()(
         setCookie("auth-role", user.role, 60 * 60 * 24 * 7);
         set({ user, tokens, isAuthenticated: true });
       },
+      setUser: (user) => set({ user }),
       logout: () => {
         apiClient.setToken(null);
         clearCookie("auth-token");
