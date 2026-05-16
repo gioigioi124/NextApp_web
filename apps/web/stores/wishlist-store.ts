@@ -20,6 +20,9 @@ type WishlistState = {
   isWishlisted: (productId: string) => boolean;
 };
 
+const wishlistSyncTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const wishlistSyncChains = new Map<string, Promise<void>>();
+
 function normalizeWishlist(wishlist: Wishlist) {
   return {
     id: wishlist.id,
@@ -30,6 +33,41 @@ function normalizeWishlist(wishlist: Wishlist) {
 }
 
 let wishlistOperationId = 0;
+
+function syncWishlistProduct(productId: string, shouldBeWishlisted: boolean) {
+  const existingTimer = wishlistSyncTimers.get(productId);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+  }
+
+  wishlistSyncTimers.set(
+    productId,
+    setTimeout(() => {
+      wishlistSyncTimers.delete(productId);
+
+      const previousSync = wishlistSyncChains.get(productId) ?? Promise.resolve();
+      const nextSync = previousSync
+        .catch(() => undefined)
+        .then(async () => {
+          if (shouldBeWishlisted) {
+            await addWishlistProduct(productId);
+          } else {
+            await removeWishlistProduct(productId);
+          }
+        })
+        .catch(() => {
+          // Keep the fast optimistic UI; the next fetch will reconcile server state.
+        })
+        .finally(() => {
+          if (wishlistSyncChains.get(productId) === nextSync) {
+            wishlistSyncChains.delete(productId);
+          }
+        });
+
+      wishlistSyncChains.set(productId, nextSync);
+    }, 250),
+  );
+}
 
 export const useWishlistStore = create<WishlistState>()((set, get) => ({
   id: null,
@@ -50,9 +88,10 @@ export const useWishlistStore = create<WishlistState>()((set, get) => ({
     }
   },
   toggleProduct: async (productId) => {
-    const operationId = ++wishlistOperationId;
+    wishlistOperationId += 1;
     const previous = get();
-    const isWishlisted = get().productIds.includes(productId);
+    const isWishlisted = previous.productIds.includes(productId);
+    const nextWishlisted = !isWishlisted;
     const productIds = isWishlisted
       ? previous.productIds.filter((id) => id !== productId)
       : [...previous.productIds, productId];
@@ -67,29 +106,12 @@ export const useWishlistStore = create<WishlistState>()((set, get) => ({
       totalItems: optimisticTotal,
     });
 
-    try {
-      const response = isWishlisted
-        ? await removeWishlistProduct(productId)
-        : await addWishlistProduct(productId);
-      if (wishlistOperationId === operationId) {
-        set(normalizeWishlist(response.data));
-      }
-    } catch (error) {
-      if (wishlistOperationId === operationId) {
-        set({
-          id: previous.id,
-          items: previous.items,
-          productIds: previous.productIds,
-          totalItems: previous.totalItems,
-        });
-      }
-      throw error;
-    }
+    syncWishlistProduct(productId, nextWishlisted);
 
-    return !isWishlisted;
+    return nextWishlisted;
   },
   removeProduct: async (productId) => {
-    const operationId = ++wishlistOperationId;
+    wishlistOperationId += 1;
     const previous = get();
     const productIds = previous.productIds.filter((id) => id !== productId);
     const items = previous.items.filter((item) => item.product.id !== productId);
@@ -100,22 +122,7 @@ export const useWishlistStore = create<WishlistState>()((set, get) => ({
       totalItems: productIds.length,
     });
 
-    try {
-      const response = await removeWishlistProduct(productId);
-      if (wishlistOperationId === operationId) {
-        set(normalizeWishlist(response.data));
-      }
-    } catch (error) {
-      if (wishlistOperationId === operationId) {
-        set({
-          id: previous.id,
-          items: previous.items,
-          productIds: previous.productIds,
-          totalItems: previous.totalItems,
-        });
-      }
-      throw error;
-    }
+    syncWishlistProduct(productId, false);
   },
   isWishlisted: (productId) => get().productIds.includes(productId),
 }));

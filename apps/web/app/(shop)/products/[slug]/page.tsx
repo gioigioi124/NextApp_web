@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CheckCircle2, ChevronRight, Ruler, ShieldCheck, Truck } from "lucide-react";
+import { CheckCircle2, ChevronRight, ShieldCheck, Truck } from "lucide-react";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { ProductCard } from "@/components/product/product-card";
 import { RatingStars } from "@/components/product/rating-stars";
@@ -41,7 +41,6 @@ export default async function ProductDetailPage({
     ? Math.round(((originalPrice - Number(product.salePrice)) / originalPrice) * 100)
     : 0;
   const attributes = getAttributes(product.attributes);
-  const variantOptions = product.variants || [];
 
   return (
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -111,29 +110,6 @@ export default async function ProductDetailPage({
             </div>
 
             <p className="mt-5 leading-7 text-muted-foreground">{product.description}</p>
-
-            {variantOptions.length ? (
-              <div className="mt-6 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">Phân loại</h3>
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Ruler className="size-3" />
-                    Bảng kích thước
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {variantOptions.map((variant) => (
-                    <button
-                      key={variant.id}
-                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium hover:border-primary hover:text-primary"
-                      type="button"
-                    >
-                      {variant.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
 
             <div className="mt-6">
               <ProductDetailActions product={product} />

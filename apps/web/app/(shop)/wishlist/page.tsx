@@ -2,11 +2,93 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { Heart, Loader2 } from "lucide-react";
-import { ProductCard } from "@/components/product/product-card";
+import { Heart, ImageIcon, Loader2, ShoppingBag, Star, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/stores/cart-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useWishlistStore } from "@/stores/wishlist-store";
+import type { WishlistItem } from "@/types/cart";
+import { formatPrice } from "shared-utils";
+
+function WishlistProductCard({ item }: { item: WishlistItem }) {
+  const product = item.product;
+  const addItem = useCartStore((state) => state.addItem);
+  const removeProduct = useWishlistStore((state) => state.removeProduct);
+  const image = product.images?.[0]?.url;
+  const price = Number(product.salePrice || product.price);
+
+  return (
+    <article className="grid overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+      <Link href={`/products/${product.slug}`} className="relative aspect-[4/3] bg-muted">
+        {image ? (
+          <img src={image} alt={product.name} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <ImageIcon className="size-8 text-muted-foreground" />
+          </div>
+        )}
+      </Link>
+      <div className="grid gap-3 p-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="truncate text-xs font-semibold uppercase text-muted-foreground">
+            {product.category?.name || product.tags?.[0] || "Lumina"}
+          </p>
+          <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+            <Star className="size-3 fill-amber-400 text-amber-400" />
+            {(product.averageRating || 0).toFixed(1)}
+          </span>
+        </div>
+        <Link
+          href={`/products/${product.slug}`}
+          className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-foreground hover:text-primary"
+        >
+          {product.name}
+        </Link>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <span className="font-bold text-foreground">{formatPrice(price)}</span>
+          {product.salePrice ? (
+            <span className="text-sm text-muted-foreground line-through">
+              {formatPrice(Number(product.price))}
+            </span>
+          ) : null}
+        </div>
+        <div className="grid gap-2">
+          <Button
+            className="h-10 rounded-lg"
+            disabled={product.stock <= 0}
+            onClick={async () => {
+              try {
+                await addItem(product, 1);
+                toast.success(`Da them ${product.name} vao gio hang`);
+              } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Khong the them vao gio hang");
+              }
+            }}
+          >
+            <ShoppingBag className="size-4" />
+            {product.stock > 0 ? "Them vao gio" : "Het hang"}
+          </Button>
+          <Button
+            variant="outline"
+            className="h-10 rounded-lg bg-background"
+            onClick={async () => {
+              try {
+                await removeProduct(product.id);
+                toast.success("Da xoa khoi wishlist");
+              } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Khong the xoa san pham");
+              }
+            }}
+          >
+            <Trash2 className="size-4" />
+            Xoa khoi wishlist
+          </Button>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export default function WishlistPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -70,7 +152,7 @@ export default function WishlistPage() {
       ) : (
         <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item) => (
-            <ProductCard key={item.id} product={item.product} />
+            <WishlistProductCard key={item.id} item={item} />
           ))}
         </section>
       )}

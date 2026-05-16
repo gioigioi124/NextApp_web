@@ -8,6 +8,9 @@ import { UploadModule } from './modules/upload/upload.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CartModule } from './modules/cart/cart.module';
+import { CouponsModule } from './modules/coupons/coupons.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -23,6 +26,9 @@ import { PrismaModule } from './prisma/prisma.module';
     CategoriesModule,
     ProductsModule,
     CartModule,
+    CouponsModule,
+    OrdersModule,
+    PaymentsModule,
     WishlistModule,
     UploadModule,
   ],
