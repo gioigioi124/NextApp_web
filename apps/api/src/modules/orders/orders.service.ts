@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import type { PrismaClient } from 'database';
+import type { OrderStatus, PaymentStatus, PrismaClient } from 'database';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CouponsService } from '../coupons/coupons.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { ListOrdersDto } from './dto/list-orders.dto';
 
 type PrismaTx = Omit<
   PrismaClient,
@@ -11,6 +12,16 @@ type PrismaTx = Omit<
 
 const SHIPPING_FEE = 35000;
 const FREE_SHIPPING_THRESHOLD = 500000;
+const RESTOCK_STATUSES: OrderStatus[] = ['CANCELLED', 'RETURNED'];
+const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  PENDING: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['PROCESSING', 'CANCELLED'],
+  PROCESSING: ['SHIPPING', 'CANCELLED'],
+  SHIPPING: ['DELIVERED', 'RETURNED'],
+  DELIVERED: ['RETURNED'],
+  CANCELLED: [],
+  RETURNED: [],
+};
 
 @Injectable()
 export class OrdersService {
@@ -164,6 +175,53 @@ export class OrdersService {
     return { data: orders.map((order) => this.serializeOrder(order)) };
   }
 
+  async findAllAdmin(query: ListOrdersDto) {
+    const page = Math.max(Number(query.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(query.limit) || 10, 1), 50);
+    const skip = (page - 1) * limit;
+    const search = query.search?.trim();
+
+    const where: any = {};
+
+    if (query.status) {
+      where.status = query.status;
+    }
+
+    if (query.paymentStatus) {
+      where.paymentStatus = query.paymentStatus;
+    }
+
+    if (search) {
+      where.OR = [
+        { orderNumber: { contains: search, mode: 'insensitive' } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+        { user: { name: { contains: search, mode: 'insensitive' } } },
+        { address: { phone: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        include: this.orderInclude(),
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders.map((order) => this.serializeOrder(order)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async findOne(userId: string, id: string) {
     const order = await this.prisma.order.findFirst({
       where: { id, userId },
@@ -177,27 +235,97 @@ export class OrdersService {
     return { data: this.serializeOrder(order) };
   }
 
-  async cancel(userId: string, id: string) {
-    const order = await this.prisma.order.findFirst({
-      where: { id, userId },
-      include: { items: true },
+  async findOneAdmin(id: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: this.orderInclude(),
     });
 
     if (!order) {
       throw new NotFoundException('Order not found');
     }
 
-    if (order.status !== 'PENDING') {
-      throw new BadRequestException('Only pending orders can be cancelled');
+    return { data: this.serializeOrder(order) };
+  }
+
+  async cancel(userId: string, id: string) {
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findFirst({
+        where: { id, userId },
+        include: { items: true },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      if (order.status !== 'PENDING') {
+        throw new BadRequestException('Only pending orders can be cancelled');
+      }
+
+      await this.restockItems(order.items, tx);
+
+      return tx.order.update({
+        where: { id },
+        data: { status: 'CANCELLED' },
+        include: this.orderInclude(),
+      });
+    });
+
+    return { data: this.serializeOrder(updated), message: 'Order cancelled successfully' };
+  }
+
+  async updateStatus(id: string, status: OrderStatus) {
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id },
+        include: { items: true },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      if (order.status === status) {
+        return tx.order.findUniqueOrThrow({
+          where: { id },
+          include: this.orderInclude(),
+        });
+      }
+
+      const allowedStatuses = STATUS_TRANSITIONS[order.status];
+      if (!allowedStatuses.includes(status)) {
+        throw new BadRequestException(`Cannot change order from ${order.status} to ${status}`);
+      }
+
+      if (RESTOCK_STATUSES.includes(status) && !RESTOCK_STATUSES.includes(order.status)) {
+        await this.restockItems(order.items, tx);
+      }
+
+      return tx.order.update({
+        where: { id },
+        data: { status },
+        include: this.orderInclude(),
+      });
+    });
+
+    return { data: this.serializeOrder(updated), message: 'Order status updated successfully' };
+  }
+
+  async updatePaymentStatus(id: string, paymentStatus: PaymentStatus) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
     }
 
     const updated = await this.prisma.order.update({
       where: { id },
-      data: { status: 'CANCELLED' },
+      data: { paymentStatus },
       include: this.orderInclude(),
     });
 
-    return { data: this.serializeOrder(updated), message: 'Order cancelled successfully' };
+    return { data: this.serializeOrder(updated), message: 'Payment status updated successfully' };
   }
 
   private async generateOrderNumber(tx: PrismaTx) {
@@ -223,6 +351,14 @@ export class OrdersService {
   private orderInclude() {
     return {
       address: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+        },
+      },
       items: {
         include: {
           product: {
@@ -247,7 +383,36 @@ export class OrdersService {
         price: Number(item.price),
         subtotal: Number(item.price) * item.quantity,
         image: item.product?.images?.[0]?.url || null,
+        productSlug: item.product?.slug || null,
       })),
     };
+  }
+
+  private async restockItems(items: any[], tx: PrismaTx) {
+    for (const item of items) {
+      const variantId = this.getVariantId(item.variant);
+
+      if (variantId) {
+        await tx.productVariant.update({
+          where: { id: variantId },
+          data: { stock: { increment: item.quantity } },
+        });
+        continue;
+      }
+
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stock: { increment: item.quantity } },
+      });
+    }
+  }
+
+  private getVariantId(variant: unknown) {
+    if (!variant || typeof variant !== 'object' || !('id' in variant)) {
+      return null;
+    }
+
+    const id = (variant as { id?: unknown }).id;
+    return typeof id === 'string' ? id : null;
   }
 }

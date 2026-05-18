@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { Loader2, PackageCheck, Plus, Save, Trash2 } from "lucide-react";
 import type { User } from "shared-types";
 import { Button } from "@/components/ui/button";
 import {
@@ -172,6 +173,10 @@ export default function ProfilePage() {
             <Button className="h-10 w-full" onClick={saveProfile} disabled={isSavingProfile}>
               {isSavingProfile ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
               Save profile
+            </Button>
+            <Button variant="outline" className="h-10 w-full" render={<Link href="/orders" />}>
+              <PackageCheck className="mr-2 size-4" />
+              View orders
             </Button>
           </CardContent>
         </Card>

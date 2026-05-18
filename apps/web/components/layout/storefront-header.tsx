@@ -9,6 +9,7 @@ import {
   Home,
   Loader2,
   Menu,
+  PackageCheck,
   Search,
   ShoppingBag,
   Sparkles,
@@ -184,6 +185,14 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
                   <Sparkles className="size-4" />
                   Sản phẩm
                 </Link>
+                <Link
+                  href="/orders"
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <PackageCheck className="size-4" />
+                  Don hang
+                </Link>
                 {popularCategories.map((category) => (
                   <Link
                     key={category.id}
@@ -255,7 +264,7 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
               {cartTotalItems}
             </span>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Tài khoản">
+          <Button variant="ghost" size="icon" aria-label="Tài khoản" render={<Link href="/profile" />}>
             <User className="size-5" />
           </Button>
         </div>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CheckCircle2, ChevronRight, ShieldCheck, Truck } from "lucide-react";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { ProductCard } from "@/components/product/product-card";
+import { ProductReviews } from "@/components/product/product-reviews";
 import { RatingStars } from "@/components/product/rating-stars";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -153,16 +154,12 @@ export default async function ProductDetailPage({
               </div>
             </TabsContent>
             <TabsContent value="reviews">
-              <div className="grid gap-4 md:grid-cols-[240px_1fr]">
-                <div className="rounded-lg bg-muted p-5 text-center">
-                  <p className="text-4xl font-bold text-foreground">{(product.averageRating || 0).toFixed(1)}</p>
-                  <RatingStars value={product.averageRating || 0} className="mt-3 justify-center" />
-                  <p className="mt-2 text-sm text-muted-foreground">{product.reviewCount || 0} đánh giá</p>
-                </div>
-                <div className="rounded-lg border border-dashed border-border p-5 text-sm text-muted-foreground">
-                  Đánh giá chi tiết sẽ hiển thị tại đây khi khách hàng hoàn tất mua hàng và gửi nhận xét.
-                </div>
-              </div>
+              <ProductReviews
+                productId={product.id}
+                averageRating={product.averageRating || 0}
+                reviewCount={product.reviewCount || 0}
+                initialReviews={product.reviews || []}
+              />
             </TabsContent>
           </Tabs>
         </section>

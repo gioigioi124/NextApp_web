@@ -19,26 +19,57 @@ export type CouponValidation = {
   discount: number;
 };
 
+export type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "PROCESSING"
+  | "SHIPPING"
+  | "DELIVERED"
+  | "CANCELLED"
+  | "RETURNED";
+
+export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED";
+
+export type OrderUser = {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+};
+
 export type Order = {
   id: string;
   orderNumber: string;
-  status: string;
+  status: OrderStatus;
   subtotal: number;
   shippingFee: number;
   discount: number;
   total: number;
   paymentMethod: string;
-  paymentStatus: string;
+  paymentStatus: PaymentStatus;
   note?: string | null;
   createdAt: string;
+  updatedAt?: string;
   address: Address;
+  user?: OrderUser;
   items: Array<
     Omit<CartItem, "unitPrice" | "product" | "variantId"> & {
       productId: string;
       name: string;
       price: number;
       image?: string | null;
+      productSlug?: string | null;
       variant?: Record<string, unknown> | null;
     }
   >;
+};
+
+export type PaginatedOrders = {
+  data: Order[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 };

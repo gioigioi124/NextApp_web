@@ -33,8 +33,10 @@ export type Review = {
   id?: string;
   rating: number;
   comment?: string;
+  images?: string[];
   createdAt?: string;
   user?: {
+    id?: string;
     name: string;
     avatar?: string | null;
   };

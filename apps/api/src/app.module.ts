@@ -11,6 +11,7 @@ import { CartModule } from './modules/cart/cart.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -29,6 +30,7 @@ import { PrismaModule } from './prisma/prisma.module';
     CouponsModule,
     OrdersModule,
     PaymentsModule,
+    ReviewsModule,
     WishlistModule,
     UploadModule,
   ],

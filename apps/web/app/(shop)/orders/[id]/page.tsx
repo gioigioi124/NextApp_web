@@ -3,10 +3,14 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2, PackageCheck } from "lucide-react";
+import { ArrowLeft, Loader2, PackageCheck, Star, XCircle } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { OrderStatusBadge, PaymentStatusBadge } from "@/components/order/order-status";
+import { OrderTimeline } from "@/components/order/order-timeline";
 import { fetchOrder } from "@/services/checkout.service";
+import { cancelOrder } from "@/services/order.service";
 import type { Order } from "@/types/order";
 import { formatPrice } from "shared-utils";
 
@@ -15,6 +19,7 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     fetchOrder(params.id)
@@ -22,6 +27,21 @@ export default function OrderDetailPage() {
       .catch(() => router.push("/profile"))
       .finally(() => setIsLoading(false));
   }, [params.id, router]);
+
+  const handleCancel = async () => {
+    if (!order) return;
+
+    setIsCancelling(true);
+    try {
+      const response = await cancelOrder(order.id);
+      setOrder(response.data);
+      toast.success("Da huy don hang");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to cancel order");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -35,9 +55,9 @@ export default function OrderDetailPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <Button variant="ghost" className="mb-5 h-10" render={<Link href="/profile" />}>
+      <Button variant="ghost" className="mb-5 h-10" render={<Link href="/orders" />}>
         <ArrowLeft className="mr-2 size-4" />
-        Tai khoan
+        Don hang
       </Button>
 
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
@@ -45,32 +65,47 @@ export default function OrderDetailPage() {
           <p className="text-sm font-semibold uppercase text-secondary">Don hang</p>
           <h1 className="text-3xl font-semibold text-foreground">{order.orderNumber}</h1>
         </div>
-        <span className="rounded-full border border-border px-3 py-1 text-sm font-semibold">
-          {order.status}
-        </span>
+        <div className="flex flex-wrap gap-2">
+          <OrderStatusBadge status={order.status} />
+          <PaymentStatusBadge status={order.paymentStatus} />
+        </div>
       </div>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div className="rounded-lg border border-border bg-card">
-          <div className="flex items-center gap-2 border-b border-border p-4">
-            <PackageCheck className="size-5 text-primary" />
-            <h2 className="font-semibold text-foreground">San pham</h2>
-          </div>
-          <div className="divide-y divide-border">
-            {order.items.map((item) => (
-              <div key={item.id} className="flex gap-3 p-4">
-                <div className="size-16 shrink-0 overflow-hidden rounded-md bg-muted">
-                  {item.image ? <img src={item.image} alt={item.name} className="h-full w-full object-cover" /> : null}
+        <div className="space-y-6">
+          <OrderTimeline status={order.status} />
+
+          <div className="rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-2 border-b border-border p-4">
+              <PackageCheck className="size-5 text-primary" />
+              <h2 className="font-semibold text-foreground">San pham</h2>
+            </div>
+            <div className="divide-y divide-border">
+              {order.items.map((item) => (
+                <div key={item.id} className="flex gap-3 p-4">
+                  <div className="size-16 shrink-0 overflow-hidden rounded-md bg-muted">
+                    {item.image ? <img src={item.image} alt={item.name} className="h-full w-full object-cover" /> : null}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-foreground">{item.name}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {formatPrice(item.price)} x {item.quantity}
+                    </p>
+                    {order.status === "DELIVERED" && item.productSlug ? (
+                      <Button
+                        variant="link"
+                        className="mt-2 h-auto p-0 text-sm"
+                        render={<Link href={`/products/${item.productSlug}`} />}
+                      >
+                        <Star className="size-4" />
+                        Danh gia san pham
+                      </Button>
+                    ) : null}
+                  </div>
+                  <p className="font-semibold text-foreground">{formatPrice(item.subtotal)}</p>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-foreground">{item.name}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {formatPrice(item.price)} x {item.quantity}
-                  </p>
-                </div>
-                <p className="font-semibold text-foreground">{formatPrice(item.subtotal)}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
@@ -106,6 +141,24 @@ export default function OrderDetailPage() {
             <span>Tong cong</span>
             <span className="text-xl">{formatPrice(order.total)}</span>
           </div>
+          {order.status === "PENDING" ? (
+            <>
+              <Separator className="my-5" />
+              <Button
+                variant="outline"
+                className="h-10 w-full text-destructive hover:text-destructive"
+                onClick={handleCancel}
+                disabled={isCancelling}
+              >
+                {isCancelling ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <XCircle className="mr-2 size-4" />
+                )}
+                Huy don hang
+              </Button>
+            </>
+          ) : null}
         </aside>
       </section>
     </main>
