@@ -1,6 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Role } from 'database';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateAddressDto } from './dto/create-address.dto';
+import { ListUsersDto } from './dto/list-users.dto';
+import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -44,6 +47,110 @@ export class UsersService {
     });
 
     return { data: user, message: 'Profile updated successfully' };
+  }
+
+  async findAllAdmin(query: ListUsersDto) {
+    const page = Math.max(Number(query.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(query.limit) || 10, 1), 50);
+    const skip = (page - 1) * limit;
+    const search = query.search?.trim();
+
+    const where: any = {};
+    if (query.role) {
+      where.role = query.role;
+    }
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' } },
+        { phone: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        select: this.adminUserSelect(),
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    const userIds = users.map((user) => user.id);
+    const totals = userIds.length
+      ? await this.prisma.order.groupBy({
+          by: ['userId'],
+          where: {
+            userId: { in: userIds },
+            status: { notIn: ['CANCELLED', 'RETURNED'] },
+          },
+          _sum: { total: true },
+        })
+      : [];
+    const totalByUser = new Map(totals.map((item) => [item.userId, Number(item._sum.total || 0)]));
+
+    return {
+      data: users.map((user) => this.serializeAdminUser(user, totalByUser.get(user.id) || 0)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findOneAdmin(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: this.adminUserSelect(),
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const total = await this.prisma.order.aggregate({
+      where: { userId, status: { notIn: ['CANCELLED', 'RETURNED'] } },
+      _sum: { total: true },
+    });
+
+    return { data: this.serializeAdminUser(user, Number(total._sum.total || 0)) };
+  }
+
+  async updateAdmin(userId: string, dto: UpdateAdminUserDto & { role?: Role }) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const adminCount = await this.prisma.user.count({ where: { role: 'ADMIN' } });
+    if (user.role === 'ADMIN' && dto.role && dto.role !== 'ADMIN' && adminCount <= 1) {
+      throw new BadRequestException('Cannot remove the last admin');
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: dto.name?.trim(),
+        phone: dto.phone === undefined ? undefined : dto.phone.trim() || null,
+        role: dto.role,
+      },
+      select: this.adminUserSelect(),
+    });
+
+    const total = await this.prisma.order.aggregate({
+      where: { userId, status: { notIn: ['CANCELLED', 'RETURNED'] } },
+      _sum: { total: true },
+    });
+
+    return {
+      data: this.serializeAdminUser(updated, Number(total._sum.total || 0)),
+      message: 'User updated successfully',
+    };
   }
 
   async listAddresses(userId: string) {
@@ -122,5 +229,39 @@ export class UsersService {
       where: { userId, isDefault: true },
       data: { isDefault: false },
     });
+  }
+
+  private adminUserSelect() {
+    return {
+      id: true,
+      email: true,
+      name: true,
+      phone: true,
+      role: true,
+      avatar: true,
+      emailVerified: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: {
+        select: {
+          orders: true,
+          reviews: true,
+          addresses: true,
+        },
+      },
+    };
+  }
+
+  private serializeAdminUser(user: any, totalSpent: number) {
+    return {
+      ...user,
+      stats: {
+        orderCount: user._count.orders,
+        reviewCount: user._count.reviews,
+        addressCount: user._count.addresses,
+        totalSpent,
+      },
+      _count: undefined,
+    };
   }
 }

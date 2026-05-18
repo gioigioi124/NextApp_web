@@ -13,6 +13,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -32,6 +33,7 @@ import { PrismaModule } from './prisma/prisma.module';
     PaymentsModule,
     ReviewsModule,
     WishlistModule,
+    DashboardModule,
     UploadModule,
   ],
   controllers: [AppController],

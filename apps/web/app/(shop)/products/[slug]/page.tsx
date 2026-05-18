@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckCircle2, ChevronRight, ShieldCheck, Truck } from "lucide-react";
@@ -9,7 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getProductBySlug, getProducts } from "@/services/catalog.service";
+import { absoluteUrl, siteConfig } from "@/lib/site";
 import { formatPrice } from "shared-utils";
+
+type ProductDetailPageProps = {
+  params: Promise<{ slug: string }>;
+};
 
 function getAttributes(attributes: unknown) {
   if (!attributes || typeof attributes !== "object" || Array.isArray(attributes)) return [];
@@ -20,11 +26,49 @@ function getAttributes(attributes: unknown) {
   }));
 }
 
+export async function generateMetadata({
+  params,
+}: ProductDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const { data: product } = await getProductBySlug(slug);
+
+  if (!product) {
+    return {
+      title: "San pham khong ton tai",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const image = product.images?.[0]?.url || siteConfig.ogImage;
+  const title = product.name;
+  const description = product.description || siteConfig.description;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: absoluteUrl(`/products/${product.slug}`),
+    },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: absoluteUrl(`/products/${product.slug}`),
+      siteName: siteConfig.name,
+      images: [{ url: image, alt: product.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
+
 export default async function ProductDetailPage({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+}: ProductDetailPageProps) {
   const { slug } = await params;
   const { data: product } = await getProductBySlug(slug);
 

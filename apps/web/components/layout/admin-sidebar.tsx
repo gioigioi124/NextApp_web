@@ -2,16 +2,27 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Layers, User } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  Layers,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  Settings,
+  ShoppingCart,
+  User,
+  Users,
+} from "lucide-react";
 import { apiClient } from "@/lib/api-client";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Tổng quan", href: "/admin" },
-  { icon: Package, label: "Sản phẩm", href: "/admin/products" },
-  { icon: Layers, label: "Danh mục", href: "/admin/categories" },
-  { icon: ShoppingCart, label: "Đơn hàng", href: "/admin/orders" },
+  { icon: LayoutDashboard, label: "Tong quan", href: "/admin" },
+  { icon: Package, label: "San pham", href: "/admin/products" },
+  { icon: Layers, label: "Danh muc", href: "/admin/categories" },
+  { icon: ShoppingCart, label: "Don hang", href: "/admin/orders" },
+  { icon: Users, label: "Nguoi dung", href: "/admin/users" },
 ];
 
 export function AdminSidebar() {
@@ -32,63 +43,76 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-card h-screen border-r border-border hidden md:flex flex-col sticky top-0">
-      <div className="h-20 flex items-center px-6 border-b border-border">
-        <h1 className="font-heading text-xl font-bold text-primary tracking-tight">LUMINA ADMIN</h1>
+    <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-border bg-card md:flex">
+      <div className="flex h-20 items-center border-b border-border px-6">
+        <h1 className="font-heading text-xl font-bold tracking-tight text-primary">LUMINA ADMIN</h1>
       </div>
-      
-      <div className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 px-2">
-          Quản lý
+
+      <div className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
+        <div className="mb-4 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Quan ly
         </div>
-        
+
         {menuItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
-          return (
-            <Link 
-              key={item.href}
-              href={item.href} 
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                isActive 
-                  ? "bg-primary/10 text-primary font-semibold shadow-sm shadow-primary/5" 
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground")} />
-              <span className="font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
+            const isActive =
+              pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200",
+                  isActive
+                    ? "bg-primary/10 font-semibold text-primary shadow-sm shadow-primary/5"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <item.icon
+                  className={cn("size-5", isActive ? "text-primary" : "text-muted-foreground")}
+                />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
 
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-8 mb-4 px-2">
-          Hệ thống
+        <div className="mb-4 mt-8 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          He thong
         </div>
 
-        <Link href="/admin/settings" className={cn(
-          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200",
-          pathname === "/admin/settings" && "bg-primary/10 text-primary font-semibold"
-        )}>
-          <Settings className="w-5 h-5" />
-          <span className="font-medium">Cài đặt</span>
+        <Link
+          href="/admin/settings"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground",
+            pathname === "/admin/settings" && "bg-primary/10 font-semibold text-primary",
+          )}
+        >
+          <Settings className="size-5" />
+          <span className="font-medium">Cai dat</span>
         </Link>
-        <Link href="/profile" className={cn(
-          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200",
-          pathname === "/profile" && "bg-primary/10 text-primary font-semibold"
-        )}>
-          <User className="w-5 h-5" />
+        <Link
+          href="/profile"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground",
+            pathname === "/profile" && "bg-primary/10 font-semibold text-primary",
+          )}
+        >
+          <User className="size-5" />
           <span className="font-medium">Profile</span>
         </Link>
       </div>
 
-      <div className="p-4 border-t border-border">
+      <div className="border-t border-border p-4">
+        <div className="mb-2 flex items-center justify-between rounded-lg bg-muted/60 px-3 py-2">
+          <span className="text-sm font-medium text-muted-foreground">Giao dien</span>
+          <ThemeToggle />
+        </div>
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-destructive transition-colors hover:bg-destructive/10"
         >
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium">Đăng xuất</span>
+          <LogOut className="size-5" />
+          <span className="font-medium">Dang xuat</span>
         </button>
       </div>
     </aside>

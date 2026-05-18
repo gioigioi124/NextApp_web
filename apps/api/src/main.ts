@@ -4,8 +4,16 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
-  // Global prefix
+  const port = Number(process.env.PORT || 8000);
+  const corsOrigins = (
+    process.env.API_CORS_ORIGIN ||
+    process.env.WEB_URL ||
+    'http://localhost:3000'
+  )
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -13,14 +21,14 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  
-  // CORS
+
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: corsOrigins,
     credentials: true,
   });
-  
-  await app.listen(8000);
-  console.log('🚀 API running on http://localhost:8000/api/v1');
+
+  await app.listen(port);
+  console.log(`API running on http://localhost:${port}/api/v1`);
 }
+
 bootstrap();

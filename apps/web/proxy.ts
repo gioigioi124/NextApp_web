@@ -19,6 +19,12 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (pathname.startsWith("/admin/users") && role !== "ADMIN") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin";
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
 }
 

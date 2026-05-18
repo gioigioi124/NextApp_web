@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "@/components/cart/cart-drawer";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Command,
   CommandDialog,
@@ -242,6 +243,7 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(true)} aria-label="Tìm kiếm">
             <Search className="size-5" />
           </Button>
+          <ThemeToggle className="hidden sm:inline-flex" />
           <Link
             href="/wishlist"
             className="relative inline-flex size-8 items-center justify-center rounded-lg hover:bg-muted"
