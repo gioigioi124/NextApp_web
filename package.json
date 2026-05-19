@@ -8,14 +8,17 @@
     "db:generate": "pnpm --filter database db:generate",
     "db:push": "pnpm --filter database db:push",
     "db:migrate": "pnpm --filter database db:migrate",
+    "db:migrate:deploy": "pnpm --filter database db:migrate:deploy",
     "db:seed": "pnpm --filter database db:seed",
     "db:studio": "pnpm --filter database db:studio",
     "seed:admin": "dotenv -e .env -- node scripts/seed-admin.mjs"
   },
   "devDependencies": {
+    "@railway/cli": "^4.58.0",
     "concurrently": "^9.2.1",
     "dotenv-cli": "^11.0.0",
-    "turbo": "^2.0.0"
+    "turbo": "^2.0.0",
+    "vercel": "^54.1.0"
   },
   "packageManager": "pnpm@9.0.0",
   "dependencies": {

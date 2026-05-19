@@ -13,16 +13,29 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { existsSync } from 'fs';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 
-// __dirname = ...apps/api/src/modules/upload (dev) or ...apps/api/dist/modules/upload (prod)
-// Go up 3 levels from src/modules/upload → apps/api, then into uploads
-const API_ROOT = join(__dirname, '..', '..', '..');
-const UPLOADS_PATH = join(API_ROOT, 'uploads');
+const UPLOADS_PATH = process.env.UPLOADS_DIR || join(process.cwd(), 'uploads');
+
+mkdirSync(UPLOADS_PATH, { recursive: true });
+
+function getApiPublicUrl() {
+  const configuredUrl = process.env.API_PUBLIC_URL?.trim();
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, '');
+  }
+
+  const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN?.trim();
+  if (railwayDomain) {
+    return `https://${railwayDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
+  }
+
+  return `http://localhost:${process.env.PORT || 8000}`;
+}
 
 @Controller('upload')
 export class UploadController {
@@ -40,7 +53,7 @@ export class UploadController {
       }),
       fileFilter: (req, file, cb) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-          return cb(new BadRequestException('Chỉ cho phép tải lên tệp ảnh!'), false);
+          return cb(new BadRequestException('Only image files are allowed.'), false);
         }
         cb(null, true);
       },
@@ -51,9 +64,9 @@ export class UploadController {
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('Vui lòng chọn tệp để tải lên!');
+      throw new BadRequestException('Please choose a file to upload.');
     }
-    const url = `http://localhost:8000/api/v1/upload/files/${file.filename}`;
+    const url = `${getApiPublicUrl()}/api/v1/upload/files/${file.filename}`;
     return { url, filename: file.filename };
   }
 
@@ -62,7 +75,7 @@ export class UploadController {
     const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '');
     const filePath = join(UPLOADS_PATH, safeFilename);
     if (!existsSync(filePath)) {
-      throw new NotFoundException('File không tồn tại');
+      throw new NotFoundException('File not found');
     }
     return res.sendFile(filePath);
   }
