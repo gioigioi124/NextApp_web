@@ -58,10 +58,10 @@ export default function RegisterPage() {
         body: JSON.stringify(payload),
       });
 
-      toast.success("Dang ky thanh cong");
+      toast.success("Đăng ký thành công");
       router.push("/login");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Dang ky that bai");
+      toast.error(error instanceof Error ? error.message : "Đăng ký thất bại");
     } finally {
       setIsSubmitting(false);
     }
@@ -70,13 +70,13 @@ export default function RegisterPage() {
   return (
     <Card className="rounded-lg">
       <CardHeader>
-        <CardTitle>Dang ky</CardTitle>
-        <CardDescription>Tao tai khoan moi voi cac thong tin co ban.</CardDescription>
+        <CardTitle>Đăng ký</CardTitle>
+        <CardDescription>Tao tài khoản moi voi cac thong tin co ban.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2">
-            <Label htmlFor="name">Ho ten</Label>
+            <Label htmlFor="name">Ho tên</Label>
             <Input id="name" autoComplete="name" {...register("name")} />
             {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
@@ -94,13 +94,13 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Mat khau</Label>
+            <Label htmlFor="password">Mật khẩu</Label>
             <Input id="password" type="password" autoComplete="new-password" {...register("password")} />
             {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Xac nhan mat khau</Label>
+            <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -114,14 +114,14 @@ export default function RegisterPage() {
 
           <Button type="submit" className="h-10 w-full" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Dang ky
+            Đăng ký
           </Button>
         </form>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          Da co tai khoan?{" "}
+          Da co tài khoản?{" "}
           <Link href="/login" className="font-medium text-primary hover:underline">
-            Dang nhap
+            Đăng nhập
           </Link>
         </p>
       </CardContent>

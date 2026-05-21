@@ -100,9 +100,9 @@ export function ProductReviews({
         }
         return [response.data, ...current];
       });
-      toast.success(existingReview ? "Da cap nhat danh gia" : "Da gui danh gia");
+      toast.success(existingReview ? "Da cap nhat đánh giá" : "Da gui đánh giá");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Khong the gui danh gia");
+      toast.error(error instanceof Error ? error.message : "Khong the gui đánh giá");
     } finally {
       setIsSubmitting(false);
     }
@@ -122,9 +122,9 @@ export function ProductReviews({
       }));
       setRating(5);
       setComment("");
-      toast.success("Da xoa danh gia");
+      toast.success("Da xoa đánh giá");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Khong the xoa danh gia");
+      toast.error(error instanceof Error ? error.message : "Không thể xóa đánh giá");
     } finally {
       setIsDeleting(false);
     }
@@ -137,7 +137,7 @@ export function ProductReviews({
           <p className="text-4xl font-bold text-foreground">{displayedAverage.toFixed(1)}</p>
           <RatingStars value={displayedAverage} className="mt-3 justify-center" />
           <p className="mt-2 text-sm text-muted-foreground">
-            {reviews.length || reviewCount} danh gia
+            {reviews.length || reviewCount} đánh giá
           </p>
         </div>
 
@@ -164,23 +164,23 @@ export function ProductReviews({
           {!isAuthenticated ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h3 className="font-semibold text-foreground">Dang nhap de danh gia</h3>
+                <h3 className="font-semibold text-foreground">Đăng nhập de đánh giá</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Tai khoan da mua va nhan hang co the gui nhan xet.
+                  Tài khoản da mua va nhan hang co the gui nhan xet.
                 </p>
               </div>
-              <Button render={<Link href="/login" />}>Dang nhap</Button>
+              <Button render={<Link href="/login" />}>Đăng nhập</Button>
             </div>
           ) : canWriteReview ? (
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h3 className="font-semibold text-foreground">
-                    {existingReview ? "Cap nhat danh gia cua ban" : "Viet danh gia"}
+                    {existingReview ? "Cập nhật đánh giá cua ban" : "Viet đánh giá"}
                   </h3>
                   {context?.orderNumber ? (
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Don hang da giao: {context.orderNumber}
+                      Đơn hàng da giao: {context.orderNumber}
                     </p>
                   ) : null}
                 </div>
@@ -193,7 +193,7 @@ export function ProductReviews({
                     disabled={isDeleting}
                   >
                     {isDeleting ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
-                    Xoa
+                    Xóa
                   </Button>
                 ) : null}
               </div>
@@ -223,14 +223,14 @@ export function ProductReviews({
               />
               <Button type="button" className="h-10" onClick={handleSubmit} disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <MessageSquare className="size-4" />}
-                {existingReview ? "Cap nhat" : "Gui danh gia"}
+                {existingReview ? "Cập nhật" : "Gui đánh giá"}
               </Button>
             </div>
           ) : (
             <div>
-              <h3 className="font-semibold text-foreground">Danh gia sau khi nhan hang</h3>
+              <h3 className="font-semibold text-foreground">Đánh giá sau khi nhan hang</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Chi khach hang co don da giao moi co the danh gia san pham nay.
+                Chỉ khách hàng có đơn đã giao mới có thể đánh giá sản phẩm nay.
               </p>
             </div>
           )}
@@ -242,7 +242,7 @@ export function ProductReviews({
           </div>
         ) : reviews.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-            Chua co danh gia nao cho san pham nay.
+            Chưa có đánh giá nào cho sản phẩm này.
           </div>
         ) : (
           <div className="divide-y divide-border rounded-lg border border-border">
@@ -250,7 +250,7 @@ export function ProductReviews({
               <article key={review.id || `${review.user?.name}-${review.createdAt}`} className="p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-foreground">{review.user?.name || "Khach hang"}</p>
+                    <p className="font-semibold text-foreground">{review.user?.name || "Khách hàng"}</p>
                     <RatingStars value={review.rating} className="mt-1" />
                   </div>
                   {review.createdAt ? (

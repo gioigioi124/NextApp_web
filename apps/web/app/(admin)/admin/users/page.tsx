@@ -12,8 +12,8 @@ import { formatDate, formatPrice } from "shared-utils";
 
 const roles = ["", "CUSTOMER", "STAFF", "ADMIN"] as const;
 const roleLabels = {
-  CUSTOMER: "Khach hang",
-  STAFF: "Nhan vien",
+  CUSTOMER: "Khách hàng",
+  STAFF: "Nhân viên",
   ADMIN: "Admin",
 } as const;
 
@@ -74,7 +74,7 @@ export default function AdminUsersPage() {
       setUsers((current) =>
         current.map((user) => (user.id === userId ? response.data : user)),
       );
-      toast.success("Da cap nhat vai tro nguoi dung");
+      toast.success("Đã cập nhật vai trò người dùng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update user");
     } finally {
@@ -87,31 +87,31 @@ export default function AdminUsersPage() {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <nav className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Quan tri</span>
+            <span>Quản trị</span>
             <span>/</span>
-            <span className="font-medium text-primary">Nguoi dung</span>
+            <span className="font-medium text-primary">Người dùng</span>
           </nav>
-          <h1 className="text-3xl font-bold text-foreground">Quan ly nguoi dung</h1>
+          <h1 className="text-3xl font-bold text-foreground">Quản lý người dùng</h1>
           <p className="mt-2 text-muted-foreground">
-            Tim kiem khach hang, theo doi gia tri mua hang va phan quyen nhan su.
+            Tìm kiếm khach hang, theo doi gia tri mua hang va phan quyen nhan su.
           </p>
         </div>
         <div className="text-sm text-muted-foreground">
-          Tong <span className="font-semibold text-foreground">{total}</span> tai khoan
+          Tổng <span className="font-semibold text-foreground">{total}</span> tài khoản
         </div>
       </div>
 
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Khach hang hien thi</span>
+            <span className="text-sm text-muted-foreground">Khách hàng hiển thị</span>
             <Users className="size-5 text-primary" />
           </div>
           <p className="mt-3 text-2xl font-semibold">{visibleStats.customers}</p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Nhan vien</span>
+            <span className="text-sm text-muted-foreground">Nhân viên</span>
             <UserCog className="size-5 text-secondary" />
           </div>
           <p className="mt-3 text-2xl font-semibold">{visibleStats.staff}</p>
@@ -131,7 +131,7 @@ export default function AdminUsersPage() {
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="h-10 pl-9"
-              placeholder="Tim email, ten hoac so dien thoai"
+              placeholder="Tim email, tên hoac so dien thoai"
               value={search}
               onChange={(event) => {
                 setPage(1);
@@ -149,7 +149,7 @@ export default function AdminUsersPage() {
           >
             {roles.map((item) => (
               <option key={item || "all"} value={item}>
-                {item ? roleLabels[item] : "Tat ca vai tro"}
+                {item ? roleLabels[item] : "Tất cả vai tro"}
               </option>
             ))}
           </select>
@@ -162,7 +162,7 @@ export default function AdminUsersPage() {
               setPage(1);
             }}
           >
-            Xoa loc
+            Xóa loc
           </Button>
         </div>
       </section>
@@ -170,12 +170,12 @@ export default function AdminUsersPage() {
       <section className="overflow-x-auto rounded-lg border border-border bg-card">
         <div className="min-w-[1040px]">
           <div className="grid grid-cols-[1.25fr_130px_150px_150px_160px_140px] gap-4 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase text-muted-foreground">
-            <span>Nguoi dung</span>
-            <span>Vai tro</span>
-            <span>Don hang</span>
-            <span>Da chi</span>
-            <span>Ngay tao</span>
-            <span className="text-right">Cap nhat</span>
+            <span>Người dùng</span>
+            <span>Vai trò</span>
+            <span>Đơn hàng</span>
+            <span>Đã chi</span>
+            <span>Ngày tạo</span>
+            <span className="text-right">Cập nhật</span>
           </div>
 
           {isLoading ? (
@@ -184,7 +184,7 @@ export default function AdminUsersPage() {
             </div>
           ) : users.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted-foreground">
-              Khong co nguoi dung phu hop.
+              Không có nguoi dung phu hop.
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -210,7 +210,7 @@ export default function AdminUsersPage() {
                   <div className="text-sm">
                     <p className="font-semibold">{user.stats.orderCount}</p>
                     <p className="text-xs text-muted-foreground">
-                      {user.stats.reviewCount} danh gia - {user.stats.addressCount} dia chi
+                      {user.stats.reviewCount} đánh giá - {user.stats.addressCount} địa chỉ
                     </p>
                   </div>
                   <p className="font-semibold">{formatPrice(user.stats.totalSpent)}</p>
@@ -252,7 +252,7 @@ export default function AdminUsersPage() {
             disabled={page <= 1}
             onClick={() => setPage((current) => Math.max(current - 1, 1))}
           >
-            Truoc
+            Trước
           </Button>
           <Button
             variant="outline"

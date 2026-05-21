@@ -192,7 +192,7 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
                   onClick={() => setMobileOpen(false)}
                 >
                   <PackageCheck className="size-4" />
-                  Don hang
+                  Đơn hàng
                 </Link>
                 {popularCategories.map((category) => (
                   <Link

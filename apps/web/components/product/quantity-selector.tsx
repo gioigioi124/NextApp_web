@@ -28,7 +28,7 @@ export function QuantitySelector({ max = 99, value, onChange }: QuantitySelector
         type="button"
         variant="ghost"
         size="icon-sm"
-        aria-label="Giam so luong"
+        aria-label="Giảm số lượng"
         className="h-full flex-1 rounded-r-none"
         onClick={() => updateQuantity(quantity - 1)}
         disabled={quantity <= 1}
@@ -40,7 +40,7 @@ export function QuantitySelector({ max = 99, value, onChange }: QuantitySelector
         type="button"
         variant="ghost"
         size="icon-sm"
-        aria-label="Tang so luong"
+        aria-label="Tăng số lượng"
         className="h-full flex-1 rounded-l-none"
         onClick={() => updateQuantity(quantity + 1)}
         disabled={quantity >= max}

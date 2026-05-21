@@ -52,11 +52,11 @@ function LoginForm() {
 
       setAuth(response.data.user, response.data.tokens);
       await syncWithServer();
-      toast.success("Dang nhap thanh cong");
+      toast.success("Đăng nhập thành công");
       router.push(searchParams.get("next") || "/");
       router.refresh();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Dang nhap that bai");
+      toast.error(error instanceof Error ? error.message : "Đăng nhập thất bại");
     } finally {
       setIsSubmitting(false);
     }
@@ -65,8 +65,8 @@ function LoginForm() {
   return (
     <Card className="rounded-lg">
       <CardHeader>
-        <CardTitle>Dang nhap</CardTitle>
-        <CardDescription>Nhap email va mat khau de tiep tuc.</CardDescription>
+        <CardTitle>Đăng nhập</CardTitle>
+        <CardDescription>Nhap email va mật khẩu de tiếp tục.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -77,7 +77,7 @@ function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Mat khau</Label>
+            <Label htmlFor="password">Mật khẩu</Label>
             <Input
               id="password"
               type="password"
@@ -89,14 +89,14 @@ function LoginForm() {
 
           <Button type="submit" className="h-10 w-full" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Dang nhap
+            Đăng nhập
           </Button>
         </form>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          Chua co tai khoan?{" "}
+          Chưa có tài khoản?{" "}
           <Link href="/register" className="font-medium text-primary hover:underline">
-            Dang ky
+            Đăng ký
           </Link>
         </p>
       </CardContent>

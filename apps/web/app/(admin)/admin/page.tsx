@@ -112,17 +112,17 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <nav className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Quan tri</span>
+            <span>Quản trị</span>
             <span>/</span>
-            <span className="font-medium text-primary">Tong quan</span>
+            <span className="font-medium text-primary">Tổng quan</span>
           </nav>
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
           <p className="mt-2 text-muted-foreground">
-            Theo doi doanh thu, don hang, khach hang va ton kho can xu ly.
+            Theo doi doanh thu, đơn hàng, khach hang va ton kho can xu ly.
           </p>
         </div>
         <Button variant="outline" className="h-10" render={<Link href="/admin/orders" />}>
-          Don hang
+          Đơn hàng
           <ArrowUpRight className="size-4" />
         </Button>
       </div>
@@ -134,10 +134,10 @@ export default function AdminDashboardPage() {
           icon={CircleDollarSign}
           currency
         />
-        <MetricCard title="Don hang 30 ngay" metric={overview.metrics.orders} icon={ReceiptText} />
+        <MetricCard title="Đơn hàng 30 ngay" metric={overview.metrics.orders} icon={ReceiptText} />
         <MetricCard title="Khach moi" metric={overview.metrics.customers} icon={Users} />
         <MetricCard
-          title="Gia tri trung binh"
+          title="Giá tri trung binh"
           metric={overview.metrics.averageOrderValue}
           icon={PackageCheck}
           currency
@@ -149,7 +149,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h2 className="font-semibold text-foreground">Can xu ly</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Trang thai van hanh hien tai</p>
+              <p className="mt-1 text-sm text-muted-foreground">Trạng thái van hanh hien tai</p>
             </div>
             <AlertTriangle className="size-5 text-amber-600" />
           </div>
@@ -165,7 +165,7 @@ export default function AdminDashboardPage() {
               href="/admin/products"
               className="flex items-center justify-between gap-4 py-4 transition-colors hover:text-primary"
             >
-              <p className="text-sm text-muted-foreground">San pham sap het</p>
+              <p className="text-sm text-muted-foreground">Sản phẩm sap het</p>
               <p className="text-2xl font-semibold">{overview.metrics.lowStockCount}</p>
             </Link>
           </div>
@@ -199,9 +199,9 @@ export default function AdminDashboardPage() {
       <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border p-5">
-            <h2 className="font-semibold text-foreground">Don hang moi</h2>
+            <h2 className="font-semibold text-foreground">Đơn hàng moi</h2>
             <Button variant="ghost" className="h-8" render={<Link href="/admin/orders" />}>
-              Xem tat ca
+              Xem tất cả
             </Button>
           </div>
           <div className="divide-y divide-border">
@@ -215,7 +215,7 @@ export default function AdminDashboardPage() {
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-foreground">{order.orderNumber}</p>
                     <p className="mt-1 truncate text-sm text-muted-foreground">
-                      {order.user.name} - {order.itemCount} san pham
+                      {order.user.name} - {order.itemCount} sản phẩm
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -228,14 +228,14 @@ export default function AdminDashboardPage() {
                 </Link>
               ))
             ) : (
-              <p className="p-8 text-center text-sm text-muted-foreground">Chua co don hang.</p>
+              <p className="p-8 text-center text-sm text-muted-foreground">Chưa có đơn hàng.</p>
             )}
           </div>
         </div>
 
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border p-5">
-            <h2 className="font-semibold text-foreground">San pham ban chay</h2>
+            <h2 className="font-semibold text-foreground">Sản phẩm bán chạy</h2>
           </div>
           <div className="divide-y divide-border">
             {overview.topProducts.length ? (
@@ -257,7 +257,7 @@ export default function AdminDashboardPage() {
                 </div>
               ))
             ) : (
-              <p className="p-8 text-center text-sm text-muted-foreground">Chua co du lieu ban hang.</p>
+              <p className="p-8 text-center text-sm text-muted-foreground">Chưa có du lieu ban hang.</p>
             )}
           </div>
         </div>
@@ -286,13 +286,13 @@ export default function AdminDashboardPage() {
                   Ton {product.stock}
                 </Badge>
                 <Button variant="outline" className="h-8" render={<Link href={`/admin/products/${product.id}/edit`} />}>
-                  Cap nhat
+                  Cập nhật
                 </Button>
               </div>
             ))
           ) : (
             <p className="p-8 text-center text-sm text-muted-foreground">
-              Khong co san pham sap het hang.
+              Không có sản phẩm sap het hang.
             </p>
           )}
         </div>

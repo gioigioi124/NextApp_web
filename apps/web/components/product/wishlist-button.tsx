@@ -17,7 +17,7 @@ type WishlistButtonProps = {
 
 export function WishlistButton({
   productId,
-  label = "Luu vao yeu thich",
+  label = "Lưu vao yêu thích",
   className,
   iconOnly = false,
 }: WishlistButtonProps) {
@@ -34,7 +34,7 @@ export function WishlistButton({
     }
 
     const wasWishlisted = isWishlisted;
-    toast.success(wasWishlisted ? "Da xoa khoi wishlist" : "Da them vao wishlist");
+    toast.success(wasWishlisted ? "Da xoa khoi wishlist" : "Đã thêm vao wishlist");
 
     try {
       await toggleProduct(productId);

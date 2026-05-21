@@ -62,7 +62,7 @@ export default function AdminOrderDetailPage() {
     try {
       const response = await updateAdminOrderStatus(order.id, status);
       setOrder(response.data);
-      toast.success("Da cap nhat trang thai don hang");
+      toast.success("Da cap nhat trạng thái đơn hàng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update order");
     } finally {
@@ -76,7 +76,7 @@ export default function AdminOrderDetailPage() {
     try {
       const response = await updateAdminPaymentStatus(order.id, paymentStatus);
       setOrder(response.data);
-      toast.success("Da cap nhat thanh toan");
+      toast.success("Da cap nhat thanh toán");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update payment");
     } finally {
@@ -98,12 +98,12 @@ export default function AdminOrderDetailPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <Button variant="ghost" className="h-10" render={<Link href="/admin/orders" />}>
         <ArrowLeft className="mr-2 size-4" />
-        Don hang
+        Đơn hàng
       </Button>
 
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
         <div>
-          <p className="text-sm font-semibold uppercase text-secondary">Chi tiet don hang</p>
+          <p className="text-sm font-semibold uppercase text-secondary">Chi tiết đơn hàng</p>
           <h1 className="mt-1 text-3xl font-bold text-foreground">{order.orderNumber}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Tao luc {new Date(order.createdAt).toLocaleString("vi-VN")}
@@ -122,7 +122,7 @@ export default function AdminOrderDetailPage() {
           <div className="rounded-lg border border-border bg-card">
             <div className="flex items-center gap-2 border-b border-border p-4">
               <PackageCheck className="size-5 text-primary" />
-              <h2 className="font-semibold text-foreground">San pham</h2>
+              <h2 className="font-semibold text-foreground">Sản phẩm</h2>
             </div>
             <div className="divide-y divide-border">
               {order.items.map((item) => (
@@ -150,17 +150,17 @@ export default function AdminOrderDetailPage() {
               <h2 className="font-semibold text-foreground">Ghi chu</h2>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              {order.note || "Khach hang khong de lai ghi chu."}
+              {order.note || "Khách hàng khong de lai ghi chu."}
             </p>
           </div>
         </div>
 
         <aside className="h-fit space-y-4">
           <div className="rounded-lg border border-border bg-card p-5">
-            <h2 className="font-semibold text-foreground">Cap nhat xu ly</h2>
+            <h2 className="font-semibold text-foreground">Cập nhật xu ly</h2>
             <div className="mt-4 grid gap-3">
               <label className="grid gap-2 text-sm">
-                <span className="font-medium text-muted-foreground">Trang thai don hang</span>
+                <span className="font-medium text-muted-foreground">Trạng thái đơn hàng</span>
                 <select
                   className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
                   value={order.status}
@@ -175,7 +175,7 @@ export default function AdminOrderDetailPage() {
                 </select>
               </label>
               <label className="grid gap-2 text-sm">
-                <span className="font-medium text-muted-foreground">Thanh toan</span>
+                <span className="font-medium text-muted-foreground">Thanh toán</span>
                 <select
                   className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
                   value={order.paymentStatus}
@@ -234,14 +234,14 @@ export default function AdminOrderDetailPage() {
               </div>
               {order.discount > 0 ? (
                 <div className="flex justify-between text-primary">
-                  <span>Giam gia</span>
+                  <span>Giảm giá</span>
                   <span>-{formatPrice(order.discount)}</span>
                 </div>
               ) : null}
             </div>
             <Separator className="my-5" />
             <div className="flex justify-between font-semibold">
-              <span>Tong cong</span>
+              <span>Tổng cong</span>
               <span className="text-xl">{formatPrice(order.total)}</span>
             </div>
           </div>

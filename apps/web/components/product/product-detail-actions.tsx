@@ -67,15 +67,15 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
 
       {selectedVariant ? (
         <div className="rounded-lg bg-muted p-3">
-          <p className="text-xs text-muted-foreground">Gia phan loai</p>
+          <p className="text-xs text-muted-foreground">Giá phân loại</p>
           <p className="mt-1 text-lg font-bold text-foreground">{formatPrice(price)}</p>
         </div>
       ) : null}
 
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">So luong</h3>
-          <p className="mt-1 text-xs text-muted-foreground">Con {stock} san pham</p>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">Số lượng</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Còn {stock} sản phẩm</p>
         </div>
         <QuantitySelector max={stock || 1} value={quantity} onChange={setQuantity} />
       </div>
@@ -85,14 +85,14 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
         onClick={async () => {
           try {
             await addItem(product, quantity, selectedVariantId);
-            toast.success(`Da them ${product.name} vao gio hang`);
+            toast.success(`Đã thêm ${product.name} vào giỏ hàng`);
           } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Khong the them vao gio hang");
+            toast.error(error instanceof Error ? error.message : "Không thể thêm vào giỏ hàng");
           }
         }}
       >
         <ShoppingBag className="size-5" />
-        {inStock ? "Them vao gio hang" : "Het hang"}
+        {inStock ? "Thêm vào giỏ hàng" : "Hết hàng"}
       </Button>
       <Button
         variant="outline"

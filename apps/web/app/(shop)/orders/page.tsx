@@ -55,7 +55,7 @@ export default function OrdersPage() {
       setOrders((current) =>
         current.map((order) => (order.id === orderId ? response.data : order)),
       );
-      toast.success("Da huy don hang");
+      toast.success("Đã hủy đơn hàng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to cancel order");
     } finally {
@@ -75,9 +75,9 @@ export default function OrdersPage() {
     return (
       <main className="mx-auto flex min-h-[520px] max-w-3xl flex-col items-center justify-center px-4 text-center">
         <ShoppingBag className="size-12 text-muted-foreground" />
-        <h1 className="mt-4 text-2xl font-semibold text-foreground">Dang nhap de xem don hang</h1>
+        <h1 className="mt-4 text-2xl font-semibold text-foreground">Đăng nhập để xem đơn hàng</h1>
         <Button className="mt-5" render={<Link href="/login" />}>
-          Dang nhap
+          Đăng nhập
         </Button>
       </main>
     );
@@ -87,8 +87,8 @@ export default function OrdersPage() {
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-secondary">Don hang</p>
-          <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Theo doi don hang</h1>
+          <p className="text-sm font-semibold uppercase text-secondary">Đơn hàng</p>
+          <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Theo doi đơn hàng</h1>
         </div>
         <Button variant="outline" className="h-10" render={<Link href="/products" />}>
           Tiep tuc mua sam
@@ -98,9 +98,9 @@ export default function OrdersPage() {
       {orders.length === 0 ? (
         <section className="rounded-lg border border-dashed border-border p-10 text-center">
           <PackageCheck className="mx-auto size-12 text-muted-foreground" />
-          <h2 className="mt-4 text-xl font-semibold text-foreground">Chua co don hang</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">Chưa có đơn hàng</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Cac don hang sau khi checkout se xuat hien tai day.
+            Cac đơn hàng sau khi checkout se xuat hien tai day.
           </p>
         </section>
       ) : (
@@ -119,7 +119,7 @@ export default function OrdersPage() {
                   className="shrink-0 rounded-full border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted data-[active=true]:border-primary data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                   data-active={active}
                 >
-                  {item === "ALL" ? "Tat ca" : ORDER_STATUS_LABELS[item]} ({count})
+                  {item === "ALL" ? "Tất cả" : ORDER_STATUS_LABELS[item]} ({count})
                 </button>
               );
             })}
@@ -127,7 +127,7 @@ export default function OrdersPage() {
 
           {visibleOrders.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Khong co don hang trong trang thai nay.
+              Không có đơn hàng trong trạng thái nay.
             </div>
           ) : null}
 
@@ -146,7 +146,7 @@ export default function OrdersPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-muted-foreground">{order.items.length} san pham</p>
+                  <p className="text-sm text-muted-foreground">{order.items.length} sản phẩm</p>
                   <p className="mt-1 text-xl font-semibold text-foreground">
                     {formatPrice(order.total)}
                   </p>
@@ -184,11 +184,11 @@ export default function OrdersPage() {
                       ) : (
                         <XCircle className="mr-2 size-4" />
                       )}
-                      Huy don
+                      Hủy don
                     </Button>
                   ) : null}
                   <Button className="h-10" render={<Link href={`/orders/${order.id}`} />}>
-                    Chi tiet
+                    Chi tiết
                   </Button>
                 </div>
               </div>

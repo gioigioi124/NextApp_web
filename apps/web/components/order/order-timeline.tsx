@@ -11,13 +11,13 @@ export function OrderTimeline({ status }: { status: OrderStatus }) {
 
     return (
       <div className="rounded-lg border border-border bg-card p-5">
-        <h2 className="font-semibold text-foreground">Tien trinh don hang</h2>
+        <h2 className="font-semibold text-foreground">Tien trinh đơn hàng</h2>
         <div className="mt-4 flex items-start gap-3 rounded-lg bg-muted p-4">
           <Icon className="mt-0.5 size-5 text-muted-foreground" />
           <div>
             <p className="font-medium text-foreground">{ORDER_STATUS_LABELS[status]}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Don hang da ket thuc va khong con trong luong giao hang dang xu ly.
+              Đơn hàng da ket thuc va khong con trong luong giao hang dang xu ly.
             </p>
           </div>
         </div>
@@ -29,7 +29,7 @@ export function OrderTimeline({ status }: { status: OrderStatus }) {
 
   return (
     <div className="rounded-lg border border-border bg-card p-5">
-      <h2 className="font-semibold text-foreground">Tien trinh don hang</h2>
+      <h2 className="font-semibold text-foreground">Tien trinh đơn hàng</h2>
       <div className="mt-5 grid gap-4 sm:grid-cols-5">
         {activeFlow.map((item, index) => {
           const isDone = index < currentIndex;

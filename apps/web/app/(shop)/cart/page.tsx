@@ -24,14 +24,14 @@ export default function CartPage() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Lumina checkout</p>
           <h1 className="[font-family:var(--font-heading)] text-3xl font-semibold text-foreground sm:text-4xl">
-            Gio hang
+            Giỏ hàng
           </h1>
         </div>
         <Link
           href="/products"
           className="inline-flex h-10 items-center rounded-lg border border-border px-4 text-sm font-semibold hover:bg-muted"
         >
-          Tiep tuc mua hang
+          Tiếp tục mua hàng
         </Link>
       </div>
 
@@ -40,21 +40,21 @@ export default function CartPage() {
           <div className="flex size-16 items-center justify-center rounded-full bg-muted">
             <ShoppingBag className="size-7 text-muted-foreground" />
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-foreground">Gio hang dang trong</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">Giỏ hàng đang trống</h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            Cac san pham duoc them vao gio se hien thi tai day de ban kiem tra truoc khi thanh toan.
+            Các sản phẩm được thêm vào giỏ se hiển thị tại đây de ban kiểm tra trước khi thanh toán.
           </p>
           <Button className="mt-5">
-            <Link href="/products">Xem san pham</Link>
+            <Link href="/products">Xem sản phẩm</Link>
           </Button>
         </section>
       ) : (
         <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="rounded-lg border border-border bg-card">
             <div className="flex items-center justify-between border-b border-border p-4">
-              <p className="font-semibold text-foreground">{totalItems} san pham</p>
+              <p className="font-semibold text-foreground">{totalItems} sản phẩm</p>
               <Button variant="ghost" size="sm" onClick={clearCart}>
-                Xoa tat ca
+                Xóa tất cả
               </Button>
             </div>
 
@@ -87,7 +87,7 @@ export default function CartPage() {
                         variant="ghost"
                         size="icon-sm"
                         className="h-9 rounded-r-none"
-                        aria-label="Giam so luong"
+                        aria-label="Giảm số lượng"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1}
                       >
@@ -98,7 +98,7 @@ export default function CartPage() {
                         variant="ghost"
                         size="icon-sm"
                         className="h-9 rounded-l-none"
-                        aria-label="Tang so luong"
+                        aria-label="Tăng số lượng"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         disabled={item.quantity >= item.product.stock}
                       >
@@ -109,7 +109,7 @@ export default function CartPage() {
 
                   <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
                     <p className="font-bold text-foreground">{formatPrice(item.subtotal)}</p>
-                    <Button variant="ghost" size="icon-sm" aria-label="Xoa san pham" onClick={() => removeItem(item.id)}>
+                    <Button variant="ghost" size="icon-sm" aria-label="Xóa sản phẩm" onClick={() => removeItem(item.id)}>
                       <Trash2 className="size-4" />
                     </Button>
                   </div>
@@ -119,7 +119,7 @@ export default function CartPage() {
           </div>
 
           <aside className="h-fit rounded-lg border border-border bg-card p-5 shadow-sm lg:sticky lg:top-32">
-            <h2 className="text-lg font-semibold text-foreground">Tom tat don hang</h2>
+            <h2 className="text-lg font-semibold text-foreground">Tom tat đơn hàng</h2>
             <div className="mt-5 grid gap-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Tam tinh</span>
@@ -137,20 +137,20 @@ export default function CartPage() {
               <div className="mt-2 flex gap-2">
                 <Input id="coupon" placeholder="Nhap ma" disabled />
                 <Button variant="outline" disabled>
-                  Ap dung
+                  Áp dụng
                 </Button>
               </div>
             </div>
             <Separator className="my-5" />
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-foreground">Tong cong</span>
+              <span className="font-semibold text-foreground">Tổng cong</span>
               <span className="text-xl font-bold text-foreground">{formatPrice(total)}</span>
             </div>
             <Link
               href="/checkout"
               className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
-              Thanh toan
+              Thanh toán
             </Link>
           </aside>
         </section>

@@ -102,7 +102,7 @@ export default function AdminOrdersPage() {
       setOrders((current) =>
         current.map((order) => (order.id === orderId ? response.data : order)),
       );
-      toast.success("Da cap nhat trang thai don hang");
+      toast.success("Da cap nhat trạng thái đơn hàng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update order");
     } finally {
@@ -117,7 +117,7 @@ export default function AdminOrdersPage() {
       setOrders((current) =>
         current.map((order) => (order.id === orderId ? response.data : order)),
       );
-      toast.success("Da cap nhat thanh toan");
+      toast.success("Da cap nhat thanh toán");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update payment");
     } finally {
@@ -130,17 +130,17 @@ export default function AdminOrdersPage() {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <nav className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Quan tri</span>
+            <span>Quản trị</span>
             <span>/</span>
-            <span className="font-medium text-primary">Don hang</span>
+            <span className="font-medium text-primary">Đơn hàng</span>
           </nav>
-          <h1 className="text-3xl font-bold text-foreground">Quan ly don hang</h1>
+          <h1 className="text-3xl font-bold text-foreground">Quan ly đơn hàng</h1>
           <p className="mt-2 text-muted-foreground">
-            Theo doi tien do, thanh toan va xu ly trang thai giao hang.
+            Theo doi tien do, thanh toán va xu ly trạng thái giao hang.
           </p>
         </div>
         <div className="text-sm text-muted-foreground">
-          Tong <span className="font-semibold text-foreground">{total}</span> don hang
+          Tổng <span className="font-semibold text-foreground">{total}</span> đơn hàng
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export default function AdminOrdersPage() {
           <p className="mt-3 text-2xl font-semibold text-foreground">{visibleStats.shipping}</p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <span className="text-sm text-muted-foreground">Gia tri hien thi</span>
+          <span className="text-sm text-muted-foreground">Giá tri hiển thị</span>
           <p className="mt-3 text-2xl font-semibold text-foreground">
             {formatPrice(visibleStats.revenue)}
           </p>
@@ -173,7 +173,7 @@ export default function AdminOrdersPage() {
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="h-10 pl-9"
-              placeholder="Tim ma don, email, ten khach hoac so dien thoai"
+              placeholder="Tim ma don, email, tên khach hoac so dien thoai"
               value={search}
               onChange={(event) => {
                 setPage(1);
@@ -191,7 +191,7 @@ export default function AdminOrdersPage() {
           >
             {orderStatuses.map((item) => (
               <option key={item || "all"} value={item}>
-                {item ? ORDER_STATUS_LABELS[item] : "Tat ca trang thai"}
+                {item ? ORDER_STATUS_LABELS[item] : "Tất cả trạng thái"}
               </option>
             ))}
           </select>
@@ -205,7 +205,7 @@ export default function AdminOrdersPage() {
           >
             {paymentStatuses.map((item) => (
               <option key={item || "all"} value={item}>
-                {item ? PAYMENT_STATUS_LABELS[item] : "Tat ca thanh toan"}
+                {item ? PAYMENT_STATUS_LABELS[item] : "Tất cả thanh toán"}
               </option>
             ))}
           </select>
@@ -219,7 +219,7 @@ export default function AdminOrdersPage() {
               setPage(1);
             }}
           >
-            Xoa loc
+            Xóa loc
           </Button>
         </div>
       </section>
@@ -227,11 +227,11 @@ export default function AdminOrdersPage() {
       <section className="overflow-x-auto rounded-lg border border-border bg-card">
         <div className="min-w-[960px]">
           <div className="grid grid-cols-[1.25fr_1fr_150px_160px_120px] gap-4 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase text-muted-foreground">
-            <span>Don hang</span>
-            <span>Khach hang</span>
-            <span>Trang thai</span>
-            <span>Thanh toan</span>
-            <span className="text-right">Tong tien</span>
+            <span>Đơn hàng</span>
+            <span>Khách hàng</span>
+            <span>Trạng thái</span>
+            <span>Thanh toán</span>
+            <span className="text-right">Tổng tien</span>
           </div>
 
           {isLoading ? (
@@ -240,7 +240,7 @@ export default function AdminOrdersPage() {
             </div>
           ) : orders.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted-foreground">
-              Khong co don hang phu hop.
+              Không có đơn hàng phu hop.
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -259,7 +259,7 @@ export default function AdminOrdersPage() {
                       ) : null}
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {new Date(order.createdAt).toLocaleString("vi-VN")} · {order.items.length} san pham
+                      {new Date(order.createdAt).toLocaleString("vi-VN")} · {order.items.length} sản phẩm
                     </p>
                   </div>
                   <div className="min-w-0 text-sm">
@@ -310,7 +310,7 @@ export default function AdminOrdersPage() {
                       variant="ghost"
                       size="icon-sm"
                       className="mt-2"
-                      aria-label="Xem chi tiet"
+                      aria-label="Xem chi tiết"
                       render={<Link href={`/admin/orders/${order.id}`} />}
                     >
                       <Eye className="size-4" />
@@ -334,7 +334,7 @@ export default function AdminOrdersPage() {
             disabled={page <= 1}
             onClick={() => setPage((current) => Math.max(current - 1, 1))}
           >
-            Truoc
+            Trước
           </Button>
           <Button
             variant="outline"

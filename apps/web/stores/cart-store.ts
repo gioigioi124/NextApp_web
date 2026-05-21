@@ -173,7 +173,7 @@ export const useCartStore = create<CartState>()(
         const stock = variant?.stock ?? product.stock;
 
         if (stock <= 0 || quantity > stock) {
-          throw new Error("San pham da het hang");
+          throw new Error("Sản phẩm đã hết hàng");
         }
 
         const previous = get();

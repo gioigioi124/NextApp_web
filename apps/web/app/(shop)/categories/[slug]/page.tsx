@@ -22,7 +22,7 @@ export async function generateMetadata({
 
   if (!category) {
     return {
-      title: "Danh muc khong ton tai",
+      title: "Danh mục không tồn tại",
       robots: { index: false, follow: false },
     };
   }

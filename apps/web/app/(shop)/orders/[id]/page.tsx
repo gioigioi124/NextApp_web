@@ -35,7 +35,7 @@ export default function OrderDetailPage() {
     try {
       const response = await cancelOrder(order.id);
       setOrder(response.data);
-      toast.success("Da huy don hang");
+      toast.success("Đã hủy đơn hàng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to cancel order");
     } finally {
@@ -57,12 +57,12 @@ export default function OrderDetailPage() {
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       <Button variant="ghost" className="mb-5 h-10" render={<Link href="/orders" />}>
         <ArrowLeft className="mr-2 size-4" />
-        Don hang
+        Đơn hàng
       </Button>
 
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold uppercase text-secondary">Don hang</p>
+          <p className="text-sm font-semibold uppercase text-secondary">Đơn hàng</p>
           <h1 className="text-3xl font-semibold text-foreground">{order.orderNumber}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -78,7 +78,7 @@ export default function OrderDetailPage() {
           <div className="rounded-lg border border-border bg-card">
             <div className="flex items-center gap-2 border-b border-border p-4">
               <PackageCheck className="size-5 text-primary" />
-              <h2 className="font-semibold text-foreground">San pham</h2>
+              <h2 className="font-semibold text-foreground">Sản phẩm</h2>
             </div>
             <div className="divide-y divide-border">
               {order.items.map((item) => (
@@ -98,7 +98,7 @@ export default function OrderDetailPage() {
                         render={<Link href={`/products/${item.productSlug}`} />}
                       >
                         <Star className="size-4" />
-                        Danh gia san pham
+                        Đánh giá sản phẩm
                       </Button>
                     ) : null}
                   </div>
@@ -131,14 +131,14 @@ export default function OrderDetailPage() {
             </div>
             {order.discount > 0 ? (
               <div className="flex justify-between text-primary">
-                <span>Giam gia</span>
+                <span>Giảm giá</span>
                 <span>-{formatPrice(order.discount)}</span>
               </div>
             ) : null}
           </div>
           <Separator className="my-5" />
           <div className="flex justify-between font-semibold">
-            <span>Tong cong</span>
+            <span>Tổng cong</span>
             <span className="text-xl">{formatPrice(order.total)}</span>
           </div>
           {order.status === "PENDING" ? (
@@ -155,7 +155,7 @@ export default function OrderDetailPage() {
                 ) : (
                   <XCircle className="mr-2 size-4" />
                 )}
-                Huy don hang
+                Hủy đơn hàng
               </Button>
             </>
           ) : null}

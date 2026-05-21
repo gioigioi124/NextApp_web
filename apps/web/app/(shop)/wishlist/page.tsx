@@ -60,14 +60,14 @@ function WishlistProductCard({ item }: { item: WishlistItem }) {
             onClick={async () => {
               try {
                 await addItem(product, 1);
-                toast.success(`Da them ${product.name} vao gio hang`);
+                toast.success(`Đã thêm ${product.name} vào giỏ hàng`);
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Khong the them vao gio hang");
+                toast.error(error instanceof Error ? error.message : "Không thể thêm vào giỏ hàng");
               }
             }}
           >
             <ShoppingBag className="size-4" />
-            {product.stock > 0 ? "Them vao gio" : "Het hang"}
+            {product.stock > 0 ? "Thêm vào giỏ" : "Hết hàng"}
           </Button>
           <Button
             variant="outline"
@@ -77,12 +77,12 @@ function WishlistProductCard({ item }: { item: WishlistItem }) {
                 await removeProduct(product.id);
                 toast.success("Da xoa khoi wishlist");
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Khong the xoa san pham");
+                toast.error(error instanceof Error ? error.message : "Không thể xóa sản phẩm");
               }
             }}
           >
             <Trash2 className="size-4" />
-            Xoa khoi wishlist
+            Xóa khoi wishlist
           </Button>
         </div>
       </div>
@@ -108,14 +108,14 @@ export default function WishlistPage() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Lumina wishlist</p>
           <h1 className="[font-family:var(--font-heading)] text-3xl font-semibold text-foreground sm:text-4xl">
-            San pham yeu thich
+            Sản phẩm yêu thích
           </h1>
         </div>
         <Link
           href="/products"
           className="inline-flex h-10 items-center rounded-lg border border-border px-4 text-sm font-semibold hover:bg-muted"
         >
-          Tiep tuc mua hang
+          Tiếp tục mua hàng
         </Link>
       </div>
 
@@ -124,12 +124,12 @@ export default function WishlistPage() {
           <div className="flex size-16 items-center justify-center rounded-full bg-muted">
             <Heart className="size-7 text-muted-foreground" />
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-foreground">Dang nhap de xem wishlist</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">Đăng nhập để xem wishlist</h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            Wishlist duoc luu theo tai khoan de ban co the xem lai tren nhieu thiet bi.
+            Wishlist duoc luu theo tài khoản de ban co the xem lai tren nhieu thiet bi.
           </p>
           <Button className="mt-5">
-            <Link href="/login?next=/wishlist">Dang nhap</Link>
+            <Link href="/login?next=/wishlist">Đăng nhập</Link>
           </Button>
         </section>
       ) : isLoading && items.length === 0 ? (
@@ -141,12 +141,12 @@ export default function WishlistPage() {
           <div className="flex size-16 items-center justify-center rounded-full bg-muted">
             <Heart className="size-7 text-muted-foreground" />
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-foreground">Chua co san pham yeu thich</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">Chưa có sản phẩm yêu thích</h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            Nhan bieu tuong trai tim tren san pham de luu vao danh sach nay.
+            Nhấn biểu tượng trái tim tren sản phẩm để lưu vào danh sách này.
           </p>
           <Button className="mt-5">
-            <Link href="/products">Kham pha san pham</Link>
+            <Link href="/products">Khám phá sản phẩm</Link>
           </Button>
         </section>
       ) : (

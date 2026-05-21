@@ -24,8 +24,8 @@ import { formatPrice } from "shared-utils";
 
 const steps = [
   { label: "Dia chi", icon: MapPin },
-  { label: "Thanh toan", icon: CreditCard },
-  { label: "Xac nhan", icon: ShieldCheck },
+  { label: "Thanh toán", icon: CreditCard },
+  { label: "Xác nhận", icon: ShieldCheck },
 ];
 
 const emptyAddress: AddressInput = {
@@ -103,7 +103,7 @@ export default function CheckoutPage() {
 
   const addAddress = async () => {
     if (!addressForm.fullName || !addressForm.phone || !addressForm.street) {
-      toast.error("Vui long nhap day du thong tin dia chi");
+      toast.error("Vui long nhap day du thong tin địa chỉ");
       return;
     }
 
@@ -118,7 +118,7 @@ export default function CheckoutPage() {
       ]);
       setSelectedAddressId(response.data.id);
       setAddressForm(emptyAddress);
-      toast.success("Da them dia chi giao hang");
+      toast.success("Đã thêm địa chỉ giao hang");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to add address");
     } finally {
@@ -146,18 +146,18 @@ export default function CheckoutPage() {
   const submitOrder = async () => {
     if (!selectedAddressId) {
       setStep(0);
-      toast.error("Vui long chon dia chi giao hang");
+      toast.error("Vui long chon địa chỉ giao hang");
       return;
     }
 
     if (items.length === 0) {
-      toast.error("Gio hang dang trong");
+      toast.error("Giỏ hàng đang trống");
       router.push("/cart");
       return;
     }
 
     if (paymentMethod === "CARD") {
-      toast.error("Thanh toan the se duoc cau hinh o buoc Stripe sau");
+      toast.error("Thanh toán the se duoc cau hinh o buoc Stripe sau");
       return;
     }
 
@@ -190,12 +190,12 @@ export default function CheckoutPage() {
     return (
       <main className="mx-auto flex min-h-[560px] max-w-3xl flex-col items-center justify-center px-4 text-center">
         <PackageCheck className="size-12 text-muted-foreground" />
-        <h1 className="mt-4 text-2xl font-semibold text-foreground">Gio hang dang trong</h1>
+        <h1 className="mt-4 text-2xl font-semibold text-foreground">Giỏ hàng đang trống</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Them san pham vao gio hang truoc khi bat dau thanh toan.
+          Thêm sản phẩm vào giỏ hàng trước khi bắt đầu thanh toán.
         </p>
         <Button className="mt-5" render={<Link href="/products" />}>
-          Xem san pham
+          Xem sản phẩm
         </Button>
       </main>
     );
@@ -206,13 +206,13 @@ export default function CheckoutPage() {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase text-secondary">Checkout</p>
-          <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Hoan tat don hang</h1>
+          <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Hoàn tất đơn hàng</h1>
         </div>
         <Link
           href="/cart"
           className="inline-flex h-10 items-center rounded-lg border border-border px-4 text-sm font-semibold hover:bg-muted"
         >
-          Quay lai gio hang
+          Quay lại giỏ hàng
         </Link>
       </div>
 
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
               <div>
                 <h2 className="text-xl font-semibold text-foreground">Dia chi giao hang</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Chon dia chi da luu hoac them dia chi moi cho don hang nay.
+                  Chọn địa chỉ đã lưu hoặc thêm địa chỉ mới cho đơn hàng này.
                 </p>
               </div>
 
@@ -276,10 +276,10 @@ export default function CheckoutPage() {
               </div>
 
               <div className="rounded-lg border border-dashed border-border p-4">
-                <h3 className="font-semibold text-foreground">Them dia chi moi</h3>
+                <h3 className="font-semibold text-foreground">Thêm địa chỉ mới</h3>
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   <Input
-                    placeholder="Ho va ten"
+                    placeholder="Ho va tên"
                     value={addressForm.fullName}
                     onChange={(event) =>
                       setAddressForm({ ...addressForm, fullName: event.target.value })
@@ -325,12 +325,12 @@ export default function CheckoutPage() {
                         setAddressForm({ ...addressForm, isDefault: event.target.checked })
                       }
                     />
-                    Dat lam dia chi mac dinh
+                    Dat lam địa chỉ mac dinh
                   </label>
                 </div>
                 <Button className="mt-4 h-10" onClick={addAddress} disabled={isSavingAddress}>
                   {isSavingAddress ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                  Luu dia chi
+                  Lưu địa chỉ
                 </Button>
               </div>
 
@@ -345,7 +345,7 @@ export default function CheckoutPage() {
           {step === 1 ? (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground">Phuong thuc thanh toan</h2>
+                <h2 className="text-xl font-semibold text-foreground">Phuong thuc thanh toán</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   COD hoat dong ngay. Stripe Elements se duoc ket noi sau khi co key.
                 </p>
@@ -361,9 +361,9 @@ export default function CheckoutPage() {
                     onChange={() => setPaymentMethod("COD")}
                   />
                   <span>
-                    <span className="font-semibold text-foreground">Thanh toan khi nhan hang</span>
+                    <span className="font-semibold text-foreground">Thanh toán khi nhan hang</span>
                     <span className="mt-1 block text-sm text-muted-foreground">
-                      Xac nhan don hang ngay va thanh toan cho don vi van chuyen.
+                      Xác nhận đơn hàng ngay va thanh toán cho don vi van chuyen.
                     </span>
                   </span>
                 </label>
@@ -386,7 +386,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between">
                 <Button variant="outline" className="h-10 px-5" onClick={() => setStep(0)}>
-                  Quay lai
+                  Quay lại
                 </Button>
                 <Button className="h-10 px-5" onClick={() => setStep(2)}>
                   Tiep tuc
@@ -398,9 +398,9 @@ export default function CheckoutPage() {
           {step === 2 ? (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground">Xac nhan don hang</h2>
+                <h2 className="text-xl font-semibold text-foreground">Xác nhận đơn hàng</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Kiem tra san pham, dia chi va tong tien truoc khi dat hang.
+                  Kiểm tra sản phẩm, địa chỉ va tổng tiền trước khi đặt hàng.
                 </p>
               </div>
 
@@ -428,7 +428,7 @@ export default function CheckoutPage() {
                       {item.variant ? (
                         <p className="text-xs text-muted-foreground">{item.variant.name}</p>
                       ) : null}
-                      <p className="mt-1 text-xs text-muted-foreground">So luong: {item.quantity}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">Số lượng: {item.quantity}</p>
                     </div>
                     <p className="text-sm font-semibold text-foreground">{formatPrice(item.subtotal)}</p>
                   </div>
@@ -446,7 +446,7 @@ export default function CheckoutPage() {
                   />
                   <Button variant="outline" className="h-10" onClick={applyCoupon} disabled={isApplyingCoupon}>
                     {isApplyingCoupon ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                    Ap dung
+                    Áp dụng
                   </Button>
                 </div>
                 {coupon ? (
@@ -457,7 +457,7 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <Label htmlFor="note">Ghi chu don hang</Label>
+                <Label htmlFor="note">Ghi chu đơn hàng</Label>
                 <Textarea
                   id="note"
                   className="mt-2"
@@ -469,7 +469,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between">
                 <Button variant="outline" className="h-10 px-5" onClick={() => setStep(1)}>
-                  Quay lai
+                  Quay lại
                 </Button>
                 <Button className="h-10 px-5" onClick={submitOrder} disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
@@ -493,14 +493,14 @@ export default function CheckoutPage() {
             </div>
             {discount > 0 ? (
               <div className="flex justify-between text-primary">
-                <span>Giam gia</span>
+                <span>Giảm giá</span>
                 <span className="font-medium">-{formatPrice(discount)}</span>
               </div>
             ) : null}
           </div>
           <Separator className="my-5" />
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-foreground">Tong cong</span>
+            <span className="font-semibold text-foreground">Tổng cong</span>
             <span className="text-xl font-bold text-foreground">{formatPrice(total)}</span>
           </div>
           <div className="mt-5 flex items-center gap-2 rounded-lg bg-muted p-3 text-xs text-muted-foreground">

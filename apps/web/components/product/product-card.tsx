@@ -69,7 +69,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             <Badge className="rounded-md bg-accent px-2 py-1 text-xs text-white">-{discount}%</Badge>
           ) : null}
           {product.isFeatured ? (
-            <Badge className="rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground">Ban chay</Badge>
+            <Badge className="rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground">Bán chạy</Badge>
           ) : null}
         </div>
 
@@ -86,15 +86,15 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             onClick={async () => {
               try {
                 await addItem(product, 1);
-                toast.success(`Da them ${product.name} vao gio hang`);
+                toast.success(`Đã thêm ${product.name} vào giỏ hàng`);
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Khong the them vao gio hang");
+                toast.error(error instanceof Error ? error.message : "Không thể thêm vào giỏ hàng");
               }
             }}
             disabled={product.stock <= 0}
           >
             <ShoppingBag className="size-4" />
-            {product.stock > 0 ? "Them vao gio" : "Het hang"}
+            {product.stock > 0 ? "Thêm vào giỏ" : "Hết hàng"}
           </Button>
         </div>
       </div>

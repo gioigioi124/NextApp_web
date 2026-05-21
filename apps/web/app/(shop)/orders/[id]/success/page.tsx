@@ -33,7 +33,7 @@ export default function OrderSuccessPage() {
     return (
       <main className="mx-auto flex min-h-[520px] max-w-3xl flex-col items-center justify-center px-4 text-center">
         <ShoppingBag className="size-10 text-muted-foreground" />
-        <h1 className="mt-4 text-2xl font-semibold text-foreground">Khong tim thay don hang</h1>
+        <h1 className="mt-4 text-2xl font-semibold text-foreground">Khong tim thay đơn hàng</h1>
         <Button className="mt-5" render={<Link href="/products" />}>
           Tiep tuc mua sam
         </Button>
@@ -47,9 +47,9 @@ export default function OrderSuccessPage() {
         <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary/10">
           <CheckCircle2 className="size-9 text-primary" />
         </div>
-        <h1 className="mt-5 text-3xl font-semibold text-foreground">Dat hang thanh cong</h1>
+        <h1 className="mt-5 text-3xl font-semibold text-foreground">Dat hang thành công</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Ma don hang <span className="font-semibold text-foreground">{order.orderNumber}</span>
+          Ma đơn hàng <span className="font-semibold text-foreground">{order.orderNumber}</span>
         </p>
 
         <div className="mt-6 rounded-lg border border-border text-left">
@@ -69,7 +69,7 @@ export default function OrderSuccessPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-1 text-sm font-semibold text-foreground">{item.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">So luong: {item.quantity}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Số lượng: {item.quantity}</p>
                 </div>
                 <p className="text-sm font-semibold text-foreground">{formatPrice(item.subtotal)}</p>
               </div>
@@ -87,14 +87,14 @@ export default function OrderSuccessPage() {
               </div>
               {order.discount > 0 ? (
                 <div className="flex justify-between text-primary">
-                  <span>Giam gia</span>
+                  <span>Giảm giá</span>
                   <span>-{formatPrice(order.discount)}</span>
                 </div>
               ) : null}
             </div>
             <Separator className="my-4" />
             <div className="flex items-center justify-between font-semibold">
-              <span>Tong cong</span>
+              <span>Tổng cong</span>
               <span className="text-xl">{formatPrice(order.total)}</span>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function OrderSuccessPage() {
             Tiep tuc mua sam
           </Button>
           <Button className="h-10" render={<Link href={`/orders/${order.id}`} />}>
-            Xem don hang
+            Xem đơn hàng
           </Button>
         </div>
       </section>

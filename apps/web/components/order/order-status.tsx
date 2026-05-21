@@ -4,16 +4,16 @@ import type { OrderStatus, PaymentStatus } from "@/types/order";
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: "Cho xac nhan",
   CONFIRMED: "Da xac nhan",
-  PROCESSING: "Dang xu ly",
+  PROCESSING: "Đang xử lý",
   SHIPPING: "Dang giao",
-  DELIVERED: "Da giao",
-  CANCELLED: "Da huy",
+  DELIVERED: "Đã giao",
+  CANCELLED: "Đã hủy",
   RETURNED: "Da hoan",
 };
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
-  UNPAID: "Chua thanh toan",
-  PAID: "Da thanh toan",
+  UNPAID: "Chua thanh toán",
+  PAID: "Da thanh toán",
   REFUNDED: "Da hoan tien",
 };
 

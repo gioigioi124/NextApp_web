@@ -18,11 +18,11 @@ import { useAuthStore } from "@/stores/auth-store";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Tong quan", href: "/admin" },
-  { icon: Package, label: "San pham", href: "/admin/products" },
-  { icon: Layers, label: "Danh muc", href: "/admin/categories" },
-  { icon: ShoppingCart, label: "Don hang", href: "/admin/orders" },
-  { icon: Users, label: "Nguoi dung", href: "/admin/users" },
+  { icon: LayoutDashboard, label: "Tổng quan", href: "/admin" },
+  { icon: Package, label: "Sản phẩm", href: "/admin/products" },
+  { icon: Layers, label: "Danh mục", href: "/admin/categories" },
+  { icon: ShoppingCart, label: "Đơn hàng", href: "/admin/orders" },
+  { icon: Users, label: "Người dùng", href: "/admin/users" },
 ];
 
 export function AdminSidebar() {
@@ -87,7 +87,7 @@ export function AdminSidebar() {
           )}
         >
           <Settings className="size-5" />
-          <span className="font-medium">Cai dat</span>
+          <span className="font-medium">Cài đặt</span>
         </Link>
         <Link
           href="/profile"
@@ -112,7 +112,7 @@ export function AdminSidebar() {
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-destructive transition-colors hover:bg-destructive/10"
         >
           <LogOut className="size-5" />
-          <span className="font-medium">Dang xuat</span>
+          <span className="font-medium">Đăng xuất</span>
         </button>
       </div>
     </aside>

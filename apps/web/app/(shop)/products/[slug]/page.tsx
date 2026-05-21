@@ -34,7 +34,7 @@ export async function generateMetadata({
 
   if (!product) {
     return {
-      title: "San pham khong ton tai",
+      title: "Sản phẩm không tồn tại",
       robots: { index: false, follow: false },
     };
   }

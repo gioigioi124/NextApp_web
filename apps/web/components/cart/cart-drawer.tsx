@@ -27,7 +27,7 @@ export function CartDrawer() {
     <Sheet open={isOpen} onOpenChange={(nextOpen) => (nextOpen ? openCart() : closeCart())}>
       <SheetContent side="right" className="w-[92vw] max-w-md gap-0">
         <SheetHeader className="border-b border-border">
-          <SheetTitle>Gio hang ({totalItems})</SheetTitle>
+          <SheetTitle>Giỏ hàng ({totalItems})</SheetTitle>
         </SheetHeader>
 
         {items.length === 0 ? (
@@ -35,16 +35,16 @@ export function CartDrawer() {
             <div className="flex size-16 items-center justify-center rounded-full bg-muted">
               <ShoppingBag className="size-7 text-muted-foreground" />
             </div>
-            <p className="mt-4 font-semibold text-foreground">Gio hang dang trong</p>
+            <p className="mt-4 font-semibold text-foreground">Giỏ hàng đang trống</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Chon san pham yeu thich de bat dau don hang.
+              Chọn sản phẩm yêu thích để bắt đầu đơn hàng.
             </p>
             <Link
               href="/products"
               onClick={closeCart}
               className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
             >
-              Tiep tuc mua hang
+              Tiếp tục mua hàng
             </Link>
           </div>
         ) : (
@@ -84,7 +84,7 @@ export function CartDrawer() {
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label="Xoa san pham"
+                        aria-label="Xóa sản phẩm"
                         onClick={() => removeItem(item.id)}
                       >
                         <Trash2 className="size-4" />
@@ -97,7 +97,7 @@ export function CartDrawer() {
                           variant="ghost"
                           size="icon-sm"
                           className="h-full rounded-r-none"
-                          aria-label="Giam so luong"
+                          aria-label="Giảm số lượng"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                         >
@@ -108,7 +108,7 @@ export function CartDrawer() {
                           variant="ghost"
                           size="icon-sm"
                           className="h-full rounded-l-none"
-                          aria-label="Tang so luong"
+                          aria-label="Tăng số lượng"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           disabled={item.quantity >= item.product.stock}
                         >
@@ -137,14 +137,14 @@ export function CartDrawer() {
               onClick={closeCart}
               className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-background px-4 text-sm font-semibold hover:bg-muted"
             >
-              Xem gio hang
+              Xem giỏ hàng
             </Link>
             <Link
               href="/checkout"
               onClick={closeCart}
               className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
-              Thanh toan
+              Thanh toán
             </Link>
           </SheetFooter>
         ) : null}
