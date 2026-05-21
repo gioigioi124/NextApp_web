@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { Heart, ImageIcon, Loader2, ShoppingBag, Star, Trash2 } from "lucide-react";
+import {
+  Heart,
+  ImageIcon,
+  Loader2,
+  ShoppingBag,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
@@ -20,9 +27,16 @@ function WishlistProductCard({ item }: { item: WishlistItem }) {
 
   return (
     <article className="grid overflow-hidden rounded-lg border border-border bg-card shadow-sm">
-      <Link href={`/products/${product.slug}`} className="relative aspect-[4/3] bg-muted">
+      <Link
+        href={`/products/${product.slug}`}
+        className="relative aspect-[4/3] bg-muted"
+      >
         {image ? (
-          <img src={image} alt={product.name} className="h-full w-full object-cover" />
+          <img
+            src={image}
+            alt={product.name}
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <ImageIcon className="size-8 text-muted-foreground" />
@@ -46,7 +60,9 @@ function WishlistProductCard({ item }: { item: WishlistItem }) {
           {product.name}
         </Link>
         <div className="flex flex-wrap items-baseline gap-2">
-          <span className="font-bold text-foreground">{formatPrice(price)}</span>
+          <span className="font-bold text-foreground">
+            {formatPrice(price)}
+          </span>
           {product.salePrice ? (
             <span className="text-sm text-muted-foreground line-through">
               {formatPrice(Number(product.price))}
@@ -62,7 +78,11 @@ function WishlistProductCard({ item }: { item: WishlistItem }) {
                 await addItem(product, 1);
                 toast.success(`Đã thêm ${product.name} vào giỏ hàng`);
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Không thể thêm vào giỏ hàng");
+                toast.error(
+                  error instanceof Error
+                    ? error.message
+                    : "Không thể thêm vào giỏ hàng",
+                );
               }
             }}
           >
@@ -75,14 +95,18 @@ function WishlistProductCard({ item }: { item: WishlistItem }) {
             onClick={async () => {
               try {
                 await removeProduct(product.id);
-                toast.success("Da xoa khoi wishlist");
+                toast.success("Đã xóa khỏi wishlist");
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Không thể xóa sản phẩm");
+                toast.error(
+                  error instanceof Error
+                    ? error.message
+                    : "Không thể xóa sản phẩm",
+                );
               }
             }}
           >
             <Trash2 className="size-4" />
-            Xóa khoi wishlist
+            Xóa khỏi wishlist
           </Button>
         </div>
       </div>
@@ -106,7 +130,9 @@ export default function WishlistPage() {
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Lumina wishlist</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-secondary">
+            Lumina wishlist
+          </p>
           <h1 className="[font-family:var(--font-heading)] text-3xl font-semibold text-foreground sm:text-4xl">
             Sản phẩm yêu thích
           </h1>
@@ -124,9 +150,12 @@ export default function WishlistPage() {
           <div className="flex size-16 items-center justify-center rounded-full bg-muted">
             <Heart className="size-7 text-muted-foreground" />
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-foreground">Đăng nhập để xem wishlist</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">
+            Đăng nhập để xem wishlist
+          </h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            Wishlist duoc luu theo tài khoản de ban co the xem lai tren nhieu thiet bi.
+            Wishlist được lưu theo tài khoản để bạn có thể xem lại trên nhiều
+            thiết bị.
           </p>
           <Button className="mt-5">
             <Link href="/login?next=/wishlist">Đăng nhập</Link>
@@ -141,7 +170,9 @@ export default function WishlistPage() {
           <div className="flex size-16 items-center justify-center rounded-full bg-muted">
             <Heart className="size-7 text-muted-foreground" />
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-foreground">Chưa có sản phẩm yêu thích</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">
+            Chưa có sản phẩm yêu thích
+          </h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
             Nhấn biểu tượng trái tim tren sản phẩm để lưu vào danh sách này.
           </p>

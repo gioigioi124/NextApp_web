@@ -16,13 +16,21 @@ type ProductDetailActionsProps = {
 };
 
 export function ProductDetailActions({ product }: ProductDetailActionsProps) {
-  const firstAvailableVariant = product.variants?.find((variant) => variant.stock > 0);
-  const [selectedVariantId, setSelectedVariantId] = useState(firstAvailableVariant?.id);
+  const firstAvailableVariant = product.variants?.find(
+    (variant) => variant.stock > 0,
+  );
+  const [selectedVariantId, setSelectedVariantId] = useState(
+    firstAvailableVariant?.id,
+  );
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
-  const selectedVariant = product.variants?.find((variant) => variant.id === selectedVariantId);
+  const selectedVariant = product.variants?.find(
+    (variant) => variant.id === selectedVariantId,
+  );
   const stock = selectedVariant?.stock ?? product.stock;
-  const price = Number(selectedVariant?.price ?? product.salePrice ?? product.price);
+  const price = Number(
+    selectedVariant?.price ?? product.salePrice ?? product.price,
+  );
   const inStock = stock > 0;
 
   const selectVariant = (variantId: string) => {
@@ -35,10 +43,12 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
       {product.variants?.length ? (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">Phan loai</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
+              Phân loại
+            </h3>
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Ruler className="size-3" />
-              Bang kich thuoc
+              Bảng kích thước
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -51,7 +61,8 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
                   className={cn(
                     "rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium transition hover:border-primary hover:text-primary",
                     selected && "border-primary bg-primary/10 text-primary",
-                    variant.stock <= 0 && "cursor-not-allowed opacity-45 hover:border-border hover:text-foreground",
+                    variant.stock <= 0 &&
+                      "cursor-not-allowed opacity-45 hover:border-border hover:text-foreground",
                   )}
                   type="button"
                   onClick={() => selectVariant(variant.id)}
@@ -68,16 +79,26 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
       {selectedVariant ? (
         <div className="rounded-lg bg-muted p-3">
           <p className="text-xs text-muted-foreground">Giá phân loại</p>
-          <p className="mt-1 text-lg font-bold text-foreground">{formatPrice(price)}</p>
+          <p className="mt-1 text-lg font-bold text-foreground">
+            {formatPrice(price)}
+          </p>
         </div>
       ) : null}
 
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">Số lượng</h3>
-          <p className="mt-1 text-xs text-muted-foreground">Còn {stock} sản phẩm</p>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
+            Số lượng
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Còn {stock} sản phẩm
+          </p>
         </div>
-        <QuantitySelector max={stock || 1} value={quantity} onChange={setQuantity} />
+        <QuantitySelector
+          max={stock || 1}
+          value={quantity}
+          onChange={setQuantity}
+        />
       </div>
       <Button
         className="h-12 rounded-lg bg-primary text-base"
@@ -87,7 +108,11 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
             await addItem(product, quantity, selectedVariantId);
             toast.success(`Đã thêm ${product.name} vào giỏ hàng`);
           } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Không thể thêm vào giỏ hàng");
+            toast.error(
+              error instanceof Error
+                ? error.message
+                : "Không thể thêm vào giỏ hàng",
+            );
           }
         }}
       >
@@ -102,7 +127,10 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
         <Zap className="size-5" />
         Mua ngay
       </Button>
-      <WishlistButton productId={product.id} className="h-11 rounded-lg bg-background" />
+      <WishlistButton
+        productId={product.id}
+        className="h-11 rounded-lg bg-background"
+      />
     </div>
   );
 }

@@ -17,14 +17,16 @@ type WishlistButtonProps = {
 
 export function WishlistButton({
   productId,
-  label = "Lưu vao yêu thích",
+  label = "Lưu vào yêu thích",
   className,
   iconOnly = false,
 }: WishlistButtonProps) {
   const router = useRouter();
   const pathname = usePathname();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isWishlisted = useWishlistStore((state) => state.productIds.includes(productId));
+  const isWishlisted = useWishlistStore((state) =>
+    state.productIds.includes(productId),
+  );
   const toggleProduct = useWishlistStore((state) => state.toggleProduct);
 
   const handleToggle = async () => {
@@ -34,12 +36,16 @@ export function WishlistButton({
     }
 
     const wasWishlisted = isWishlisted;
-    toast.success(wasWishlisted ? "Da xoa khoi wishlist" : "Đã thêm vao wishlist");
+    toast.success(
+      wasWishlisted ? "Đã xóa khỏi wishlist" : "Đã thêm vào wishlist",
+    );
 
     try {
       await toggleProduct(productId);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Khong cap nhat duoc wishlist");
+      toast.error(
+        error instanceof Error ? error.message : "Không cập nhật được wishlist",
+      );
     }
   };
 
@@ -52,7 +58,12 @@ export function WishlistButton({
       className={cn(className)}
       onClick={handleToggle}
     >
-      <Heart className={cn("size-4", isWishlisted && "fill-destructive text-destructive")} />
+      <Heart
+        className={cn(
+          "size-4",
+          isWishlisted && "fill-destructive text-destructive",
+        )}
+      />
       {iconOnly ? null : label}
     </Button>
   );
