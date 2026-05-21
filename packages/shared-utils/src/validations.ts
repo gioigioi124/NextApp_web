@@ -12,10 +12,10 @@ export const registerSchema = z.object({
   phone: z.string().optional(),
 });
 
-export const registerFormSchema = registerSchema.extênd({
-  confirmPassword: z.string().min(6, 'Mật khẩu toi thieu 6 ky tu'),
+export const registerFormSchema = registerSchema.extend({
+  confirmPassword: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự'),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'Mật khẩu xac nhan khong khop',
+  message: 'Mật khẩu xác nhận không khớp',
   path: ['confirmPassword'],
 });
 
