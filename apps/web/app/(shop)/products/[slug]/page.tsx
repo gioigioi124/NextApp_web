@@ -6,8 +6,6 @@ import { ProductDetailActions } from "@/components/product/product-detail-action
 import { ProductCard } from "@/components/product/product-card";
 import { ProductReviews } from "@/components/product/product-reviews";
 import { RatingStars } from "@/components/product/rating-stars";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getProductBySlug, getProducts } from "@/services/catalog.service";
 import { absoluteUrl, siteConfig } from "@/lib/site";
@@ -88,134 +86,200 @@ export default async function ProductDetailPage({
   const attributes = getAttributes(product.attributes);
 
   return (
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">Trang chủ</Link>
-          <ChevronRight className="size-4" />
-          <Link href="/products" className="hover:text-foreground">Sản phẩm</Link>
-          {product.category ? (
-            <>
-              <ChevronRight className="size-4" />
-              <Link href={`/categories/${product.category.slug}`} className="hover:text-foreground">
-                {product.category.name}
-              </Link>
-            </>
-          ) : null}
-        </nav>
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Breadcrumbs */}
+      <nav className="mb-8 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <Link href="/" className="hover:text-primary">Trang chủ</Link>
+        <ChevronRight className="size-4" />
+        <Link href="/products" className="hover:text-primary">Sản phẩm</Link>
+        {product.category ? (
+          <>
+            <ChevronRight className="size-4" />
+            <Link href={`/categories/${product.category.slug}`} className="hover:text-primary">
+              {product.category.name}
+            </Link>
+          </>
+        ) : null}
+        <ChevronRight className="size-4" />
+        <span className="font-bold text-primary">{product.name}</span>
+      </nav>
 
-        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-4">
-            <div className="group aspect-square overflow-hidden rounded-lg border border-border bg-muted shadow-sm md:aspect-[5/4]">
-              {mainImage ? (
+      <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-12">
+        {/* Left Column: Image Gallery */}
+        <div className="flex flex-col-reverse gap-4 md:col-span-7 md:flex-row">
+          {/* Thumbnails */}
+          <div className="hide-scrollbar flex shrink-0 gap-3 overflow-x-auto md:w-20 md:flex-col md:overflow-y-auto">
+            {images.map((image, idx) => (
+              <div
+                key={image.url}
+                className={`aspect-square w-16 cursor-pointer overflow-hidden rounded-lg border md:w-full ${
+                  idx === 0
+                    ? "border-2 border-primary ring-offset-2"
+                    : "border-border transition-colors hover:border-primary"
+                }`}
+              >
                 <img
-                  src={mainImage}
-                  alt={images[0]?.alt || product.name}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  src={image.url}
+                  alt={image.alt || `${product.name} thumbnail ${idx + 1}`}
+                  className="h-full w-full object-cover"
                 />
-              ) : null}
-            </div>
-            <div className="grid grid-cols-4 gap-3">
-              {images.slice(0, 4).map((image, index) => (
-                <div key={`${image.url}-${index}`} className="aspect-square overflow-hidden rounded-lg border border-border bg-muted">
-                  <img src={image.url} alt={image.alt || product.name} className="h-full w-full object-cover" />
-                </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+          {/* Main Image */}
+          <div className="group aspect-[4/5] flex-grow overflow-hidden rounded-xl bg-card shadow-lg">
+            {mainImage ? (
+              <img
+                src={mainImage}
+                alt={images[0]?.alt || product.name}
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+            ) : null}
+          </div>
+        </div>
 
-          <aside className="h-fit rounded-lg border border-border bg-card p-5 shadow-sm lg:sticky lg:top-32">
-            <div className="flex flex-wrap gap-2">
-              {product.category ? (
-                <Badge variant="secondary" className="rounded-full">{product.category.name}</Badge>
-              ) : null}
-              {discount > 0 ? (
-                <Badge className="rounded-full bg-accent text-white">-{discount}%</Badge>
-              ) : null}
-            </div>
-            <h1 className="[font-family:var(--font-heading)] mt-4 text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+        {/* Right Column: Sticky Info Panel */}
+        <div className="md:col-span-5 lg:sticky lg:top-28">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm md:p-8">
+            <h1 className="mb-2 font-heading text-3xl font-semibold leading-tight text-primary sm:text-4xl">
               {product.name}
             </h1>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+            
+            <div className="mb-6 flex items-center gap-4">
               <RatingStars value={product.averageRating || 0} />
-              <span className="text-sm font-medium text-foreground">{(product.averageRating || 0).toFixed(1)}</span>
               <span className="text-sm text-muted-foreground">({product.reviewCount || 0} đánh giá)</span>
-              <span className="text-sm text-muted-foreground">SKU: {product.sku || product.id}</span>
+              <div className="mx-1 h-4 w-[1px] bg-border"></div>
+              {product.stock > 0 ? (
+                <span className="text-sm font-medium text-emerald-600">Còn hàng</span>
+              ) : (
+                <span className="text-sm font-medium text-destructive">Hết hàng</span>
+              )}
             </div>
 
-            <div className="mt-6 rounded-lg bg-muted p-4">
-              <div className="flex flex-wrap items-baseline gap-3">
-                <span className="text-3xl font-bold text-foreground">{formatPrice(currentPrice)}</span>
-                {product.salePrice ? (
-                  <span className="text-lg text-muted-foreground line-through">{formatPrice(originalPrice)}</span>
-                ) : null}
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Hoặc 3 kỳ từ {formatPrice(Math.ceil(currentPrice / 3))} với ví điện tử hỗ trợ.
-              </p>
+            <div className="mb-8 flex items-baseline gap-4">
+              <span className="text-3xl font-semibold text-accent">{formatPrice(currentPrice)}</span>
+              {product.salePrice ? (
+                <>
+                  <span className="text-xl text-muted-foreground line-through">{formatPrice(originalPrice)}</span>
+                  <span className="rounded bg-accent/10 px-2 py-1 text-xs font-bold tracking-wider text-accent">-{discount}%</span>
+                </>
+              ) : null}
             </div>
 
-            <p className="mt-5 leading-7 text-muted-foreground">{product.description}</p>
-
-            <div className="mt-6">
+            {/* Options */}
+            <div className="mb-8">
               <ProductDetailActions product={product} />
             </div>
 
-            <Separator className="my-6" />
-            <div className="grid gap-3 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2"><Truck className="size-4 text-secondary" /> Giao hàng nhanh toàn quốc</span>
-              <span className="flex items-center gap-2"><ShieldCheck className="size-4 text-secondary" /> Kiểm tra chất lượng trước khi đóng gói</span>
-              <span className="flex items-center gap-2"><CheckCircle2 className="size-4 text-secondary" /> Đổi trả nếu sản phẩm lỗi sản xuất</span>
-            </div>
-          </aside>
-        </section>
-
-        <section className="mt-12 rounded-lg border border-border bg-card p-4 shadow-sm md:p-6">
-          <Tabs defaultValue="description">
-            <TabsList className="mb-6">
-              <TabsTrigger value="description">Mô tả</TabsTrigger>
-              <TabsTrigger value="specs">Thông số</TabsTrigger>
-              <TabsTrigger value="reviews">Đánh giá</TabsTrigger>
-            </TabsList>
-            <TabsContent value="description" className="max-w-3xl leading-7 text-muted-foreground">
-              {product.description}
-            </TabsContent>
-            <TabsContent value="specs">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg bg-muted p-4">
-                  <p className="text-sm text-muted-foreground">Danh mục</p>
-                  <p className="font-semibold text-foreground">{product.category?.name || "Lumina"}</p>
-                </div>
-                <div className="rounded-lg bg-muted p-4">
-                  <p className="text-sm text-muted-foreground">Tồn kho</p>
-                  <p className="font-semibold text-foreground">{product.stock} sản phẩm</p>
-                </div>
-                {attributes.map((attribute) => (
-                  <div key={attribute.key} className="rounded-lg bg-muted p-4">
-                    <p className="text-sm text-muted-foreground">{attribute.key}</p>
-                    <p className="font-semibold text-foreground">{attribute.value}</p>
-                  </div>
-                ))}
+            <div className="mt-8 space-y-4 border-t border-border pt-6">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Truck className="size-5 text-secondary" />
+                <span className="text-sm font-medium">Giao hàng toàn quốc trong 2-4 ngày</span>
               </div>
-            </TabsContent>
-            <TabsContent value="reviews">
-              <ProductReviews
-                productId={product.id}
-                averageRating={product.averageRating || 0}
-                reviewCount={product.reviewCount || 0}
-                initialReviews={product.reviews || []}
-              />
-            </TabsContent>
-          </Tabs>
-        </section>
-
-        <section className="mt-12">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Gợi ý thêm</p>
-              <h2 className="[font-family:var(--font-heading)] text-3xl font-semibold text-foreground">Sản phẩm tương tự</h2>
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <ShieldCheck className="size-5 text-secondary" />
+                <span className="text-sm font-medium">Bảo hành 1 đổi 1 trong 30 ngày</span>
+              </div>
             </div>
           </div>
-          <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        </div>
+      </div>
+
+      {/* Description Tabs */}
+      <section className="mt-16 md:mt-20">
+        <Tabs defaultValue="description">
+          <TabsList className="hide-scrollbar mb-8 flex w-full justify-start gap-8 overflow-x-auto rounded-none border-b border-border bg-transparent p-0">
+            <TabsTrigger 
+              value="description" 
+              className="rounded-none border-transparent bg-transparent px-0 pb-4 font-heading text-xl font-semibold text-muted-foreground hover:bg-transparent hover:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none"
+            >
+              Mô tả sản phẩm
+            </TabsTrigger>
+            <TabsTrigger 
+              value="specs" 
+              className="rounded-none border-transparent bg-transparent px-0 pb-4 font-heading text-xl font-semibold text-muted-foreground hover:bg-transparent hover:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none"
+            >
+              Thông số kỹ thuật
+            </TabsTrigger>
+            <TabsTrigger 
+              value="reviews" 
+              className="rounded-none border-transparent bg-transparent px-0 pb-4 font-heading text-xl font-semibold text-muted-foreground hover:bg-transparent hover:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none"
+            >
+              Đánh giá ({product.reviewCount || 0})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="description" className="max-w-4xl space-y-6 leading-relaxed text-muted-foreground">
+            {product.description}
+            {/* Extended Static Description Mockup from HTML if needed */}
+            <div className="my-10 grid gap-8 md:grid-cols-2">
+              <div className="overflow-hidden rounded-xl shadow-md">
+                <img
+                  className="h-full w-full object-cover"
+                  alt="Quality detail"
+                  src={mainImage || "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=800"}
+                />
+              </div>
+              <div className="flex flex-col justify-center space-y-4">
+                <h4 className="font-heading text-xl font-semibold text-primary">Ưu điểm vượt trội</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 size-5 text-emerald-600" />
+                    <span>100% tự nhiên cao cấp, thân thiện với làn da.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 size-5 text-emerald-600" />
+                    <span>Thoáng khí tối ưu, phù hợp cho cả 4 mùa tại Việt Nam.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 size-5 text-emerald-600" />
+                    <span>Độ bền màu cao, không xù lông hay co rút sau nhiều lần giặt.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="specs">
+            <div className="grid max-w-4xl gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
+                <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Danh mục</p>
+                <p className="mt-1 font-semibold text-foreground">{product.category?.name || "Lumina"}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
+                <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Tồn kho</p>
+                <p className="mt-1 font-semibold text-foreground">{product.stock} sản phẩm</p>
+              </div>
+              {attributes.map((attribute) => (
+                <div key={attribute.key} className="rounded-lg border border-border bg-card p-5 shadow-sm">
+                  <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{attribute.key}</p>
+                  <p className="mt-1 font-semibold text-foreground">{attribute.value}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <ProductReviews
+              productId={product.id}
+              averageRating={product.averageRating || 0}
+              reviewCount={product.reviewCount || 0}
+              initialReviews={product.reviews || []}
+            />
+          </TabsContent>
+        </Tabs>
+      </section>
+
+      {/* Similar Products */}
+      {related.data.length > 0 && (
+        <section className="mt-16 md:mt-20">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="font-heading text-3xl font-semibold text-primary">Sản phẩm tương tự</h2>
+            <Link href="/products" className="flex items-center gap-1 font-bold text-secondary hover:underline">
+              Xem tất cả <ChevronRight className="size-5" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {related.data
               .filter((item) => item.id !== product.id)
               .slice(0, 4)
@@ -224,6 +288,7 @@ export default async function ProductDetailPage({
               ))}
           </div>
         </section>
-      </main>
+      )}
+    </main>
   );
 }
