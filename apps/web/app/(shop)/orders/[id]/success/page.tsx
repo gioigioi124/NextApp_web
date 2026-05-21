@@ -33,9 +33,9 @@ export default function OrderSuccessPage() {
     return (
       <main className="mx-auto flex min-h-[520px] max-w-3xl flex-col items-center justify-center px-4 text-center">
         <ShoppingBag className="size-10 text-muted-foreground" />
-        <h1 className="mt-4 text-2xl font-semibold text-foreground">Khong tim thay đơn hàng</h1>
+        <h1 className="mt-4 text-2xl font-semibold text-foreground">Không tìm thấy đơn hàng</h1>
         <Button className="mt-5" render={<Link href="/products" />}>
-          Tiep tuc mua sam
+          Tiếp tục mua sắm
         </Button>
       </main>
     );
@@ -47,9 +47,9 @@ export default function OrderSuccessPage() {
         <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary/10">
           <CheckCircle2 className="size-9 text-primary" />
         </div>
-        <h1 className="mt-5 text-3xl font-semibold text-foreground">Dat hang thành công</h1>
+        <h1 className="mt-5 text-3xl font-semibold text-foreground">Đặt hàng thành công</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Ma đơn hàng <span className="font-semibold text-foreground">{order.orderNumber}</span>
+          Mã đơn hàng <span className="font-semibold text-foreground">{order.orderNumber}</span>
         </p>
 
         <div className="mt-6 rounded-lg border border-border text-left">
@@ -78,12 +78,12 @@ export default function OrderSuccessPage() {
           <div className="p-4">
             <div className="grid gap-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Tam tinh</span>
+                <span className="text-muted-foreground">Tạm tính</span>
                 <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Van chuyen</span>
-                <span>{order.shippingFee ? formatPrice(order.shippingFee) : "Mien phi"}</span>
+                <span className="text-muted-foreground">Vận chuyển</span>
+                <span>{order.shippingFee ? formatPrice(order.shippingFee) : "Miễn phí"}</span>
               </div>
               {order.discount > 0 ? (
                 <div className="flex justify-between text-primary">
@@ -94,7 +94,7 @@ export default function OrderSuccessPage() {
             </div>
             <Separator className="my-4" />
             <div className="flex items-center justify-between font-semibold">
-              <span>Tổng cong</span>
+              <span>Tổng cộng</span>
               <span className="text-xl">{formatPrice(order.total)}</span>
             </div>
           </div>
@@ -102,7 +102,7 @@ export default function OrderSuccessPage() {
 
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <Button variant="outline" className="h-10" render={<Link href="/products" />}>
-            Tiep tuc mua sam
+            Tiếp tục mua sắm
           </Button>
           <Button className="h-10" render={<Link href={`/orders/${order.id}`} />}>
             Xem đơn hàng

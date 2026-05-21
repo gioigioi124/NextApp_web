@@ -93,7 +93,7 @@ export default function AdminUsersPage() {
           </nav>
           <h1 className="text-3xl font-bold text-foreground">Quản lý người dùng</h1>
           <p className="mt-2 text-muted-foreground">
-            Tìm kiếm khach hang, theo doi gia tri mua hang va phan quyen nhan su.
+            Tìm kiếm khách hàng, theo dõi giá trị mua hàng và phân quyền nhân sự.
           </p>
         </div>
         <div className="text-sm text-muted-foreground">
@@ -131,7 +131,7 @@ export default function AdminUsersPage() {
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="h-10 pl-9"
-              placeholder="Tim email, tên hoac so dien thoai"
+              placeholder="Tìm email, tên hoặc số điện thoại"
               value={search}
               onChange={(event) => {
                 setPage(1);
@@ -149,7 +149,7 @@ export default function AdminUsersPage() {
           >
             {roles.map((item) => (
               <option key={item || "all"} value={item}>
-                {item ? roleLabels[item] : "Tất cả vai tro"}
+                {item ? roleLabels[item] : "Tất cả vai trò"}
               </option>
             ))}
           </select>
@@ -162,7 +162,7 @@ export default function AdminUsersPage() {
               setPage(1);
             }}
           >
-            Xóa loc
+            Xóa lọc
           </Button>
         </div>
       </section>
@@ -184,7 +184,7 @@ export default function AdminUsersPage() {
             </div>
           ) : users.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted-foreground">
-              Không có nguoi dung phu hop.
+              Không có người dùng phù hợp.
             </div>
           ) : (
             <div className="divide-y divide-border">

@@ -174,7 +174,7 @@ export default function WishlistPage() {
             Chưa có sản phẩm yêu thích
           </h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            Nhấn biểu tượng trái tim tren sản phẩm để lưu vào danh sách này.
+            Nhấn biểu tượng trái tim trên sản phẩm để lưu vào danh sách này.
           </p>
           <Button className="mt-5">
             <Link href="/products">Khám phá sản phẩm</Link>

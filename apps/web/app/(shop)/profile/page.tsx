@@ -71,7 +71,9 @@ export default function ProfilePage() {
         });
         setAddresses(addressResponse.data);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Unable to load profile");
+        toast.error(
+          error instanceof Error ? error.message : "Không thể tải hồ sơ",
+        );
         router.push("/login");
       } finally {
         setIsLoading(false);
@@ -89,9 +91,11 @@ export default function ProfilePage() {
         body: JSON.stringify(profile),
       });
       setUser(response.data);
-      toast.success("Profile updated");
+      toast.success("Đã cập nhật hồ sơ");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to update profile");
+      toast.error(
+        error instanceof Error ? error.message : "Không thể cập nhật hồ sơ",
+      );
     } finally {
       setIsSavingProfile(false);
     }
@@ -100,10 +104,13 @@ export default function ProfilePage() {
   const addAddress = async () => {
     setIsSavingAddress(true);
     try {
-      const response = await apiClient.fetch<{ data: Address }>("/users/me/addresses", {
-        method: "POST",
-        body: JSON.stringify(addressForm),
-      });
+      const response = await apiClient.fetch<{ data: Address }>(
+        "/users/me/addresses",
+        {
+          method: "POST",
+          body: JSON.stringify(addressForm),
+        },
+      );
       setAddresses((current) => [
         response.data,
         ...current.map((item) =>
@@ -111,9 +118,11 @@ export default function ProfilePage() {
         ),
       ]);
       setAddressForm(emptyAddress);
-      toast.success("Address added");
+      toast.success("Đã thêm địa chỉ");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to add address");
+      toast.error(
+        error instanceof Error ? error.message : "Không thể thêm địa chỉ",
+      );
     } finally {
       setIsSavingAddress(false);
     }
@@ -123,9 +132,11 @@ export default function ProfilePage() {
     try {
       await apiClient.fetch(`/users/me/addresses/${id}`, { method: "DELETE" });
       setAddresses((current) => current.filter((item) => item.id !== id));
-      toast.success("Address deleted");
+      toast.success("Đã xóa địa chỉ");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to delete address");
+      toast.error(
+        error instanceof Error ? error.message : "Không thể xóa địa chỉ",
+      );
     }
   };
 
@@ -142,114 +153,170 @@ export default function ProfilePage() {
       <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[360px_1fr]">
         <Card className="rounded-lg">
           <CardHeader>
-            <CardTitle>Profile</CardTitle>
-            <CardDescription>Basic account information.</CardDescription>
+            <CardTitle>Hồ sơ cá nhân</CardTitle>
+            <CardDescription>Thông tin cơ bản của tài khoản.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Họ và tên</Label>
               <Input
                 id="name"
                 value={profile.name}
-                onChange={(event) => setProfile({ ...profile, name: event.target.value })}
+                onChange={(event) =>
+                  setProfile({ ...profile, name: event.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">Điện thoại</Label>
               <Input
                 id="phone"
                 value={profile.phone}
-                onChange={(event) => setProfile({ ...profile, phone: event.target.value })}
+                onChange={(event) =>
+                  setProfile({ ...profile, phone: event.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="avatar">Avatar URL</Label>
+              <Label htmlFor="avatar">Đường dẫn ảnh đại diện</Label>
               <Input
                 id="avatar"
                 value={profile.avatar}
-                onChange={(event) => setProfile({ ...profile, avatar: event.target.value })}
+                onChange={(event) =>
+                  setProfile({ ...profile, avatar: event.target.value })
+                }
               />
             </div>
-            <Button className="h-10 w-full" onClick={saveProfile} disabled={isSavingProfile}>
-              {isSavingProfile ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
-              Save profile
+            <Button
+              className="h-10 w-full"
+              onClick={saveProfile}
+              disabled={isSavingProfile}
+            >
+              {isSavingProfile ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 size-4" />
+              )}
+              Lưu hồ sơ
             </Button>
-            <Button variant="outline" className="h-10 w-full" render={<Link href="/orders" />}>
+            <Button
+              variant="outline"
+              className="h-10 w-full"
+              render={<Link href="/orders" />}
+            >
               <PackageCheck className="mr-2 size-4" />
-              View orders
+              Xem đơn hàng
             </Button>
           </CardContent>
         </Card>
 
         <Card className="rounded-lg">
           <CardHeader>
-            <CardTitle>Addresses</CardTitle>
-            <CardDescription>Shipping addresses for checkout.</CardDescription>
+            <CardTitle>Địa chỉ</CardTitle>
+            <CardDescription>Địa chỉ giao hàng khi thanh toán.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid gap-3 md:grid-cols-2">
               <Input
-                placeholder="Full name"
+                placeholder="Họ và tên"
                 value={addressForm.fullName}
-                onChange={(event) => setAddressForm({ ...addressForm, fullName: event.target.value })}
+                onChange={(event) =>
+                  setAddressForm({
+                    ...addressForm,
+                    fullName: event.target.value,
+                  })
+                }
               />
               <Input
-                placeholder="Phone"
+                placeholder="Điện thoại"
                 value={addressForm.phone}
-                onChange={(event) => setAddressForm({ ...addressForm, phone: event.target.value })}
+                onChange={(event) =>
+                  setAddressForm({ ...addressForm, phone: event.target.value })
+                }
               />
               <Input
                 className="md:col-span-2"
-                placeholder="Street"
+                placeholder="Số nhà, tên đường"
                 value={addressForm.street}
-                onChange={(event) => setAddressForm({ ...addressForm, street: event.target.value })}
+                onChange={(event) =>
+                  setAddressForm({ ...addressForm, street: event.target.value })
+                }
               />
               <Input
-                placeholder="Ward"
+                placeholder="Phường/Xã"
                 value={addressForm.ward}
-                onChange={(event) => setAddressForm({ ...addressForm, ward: event.target.value })}
+                onChange={(event) =>
+                  setAddressForm({ ...addressForm, ward: event.target.value })
+                }
               />
               <Input
-                placeholder="District"
+                placeholder="Quận/Huyện"
                 value={addressForm.district}
-                onChange={(event) => setAddressForm({ ...addressForm, district: event.target.value })}
+                onChange={(event) =>
+                  setAddressForm({
+                    ...addressForm,
+                    district: event.target.value,
+                  })
+                }
               />
               <Input
-                placeholder="City"
+                placeholder="Tỉnh/Thành phố"
                 value={addressForm.city}
-                onChange={(event) => setAddressForm({ ...addressForm, city: event.target.value })}
+                onChange={(event) =>
+                  setAddressForm({ ...addressForm, city: event.target.value })
+                }
               />
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={addressForm.isDefault}
                   onChange={(event) =>
-                    setAddressForm({ ...addressForm, isDefault: event.target.checked })
+                    setAddressForm({
+                      ...addressForm,
+                      isDefault: event.target.checked,
+                    })
                   }
                 />
-                Default address
+                Địa chỉ mặc định
               </label>
             </div>
-            <Button className="h-10" onClick={addAddress} disabled={isSavingAddress}>
-              {isSavingAddress ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Plus className="mr-2 size-4" />}
-              Add address
+            <Button
+              className="h-10"
+              onClick={addAddress}
+              disabled={isSavingAddress}
+            >
+              {isSavingAddress ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Plus className="mr-2 size-4" />
+              )}
+              Thêm địa chỉ
             </Button>
 
             <div className="space-y-3">
               {addresses.length === 0 ? (
                 <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                  No addresses yet.
+                  Chưa có địa chỉ nào.
                 </p>
               ) : (
                 addresses.map((address) => (
-                  <div key={address.id} className="flex items-start justify-between gap-3 rounded-lg border p-4">
+                  <div
+                    key={address.id}
+                    className="flex items-start justify-between gap-3 rounded-lg border p-4"
+                  >
                     <div className="space-y-1 text-sm">
                       <div className="font-medium">
-                        {address.fullName} {address.isDefault && <span className="text-primary">(default)</span>}
+                        {address.fullName}{" "}
+                        {address.isDefault && (
+                          <span className="text-primary">(mặc định)</span>
+                        )}
                       </div>
-                      <div className="text-muted-foreground">{address.phone}</div>
+                      <div className="text-muted-foreground">
+                        {address.phone}
+                      </div>
                       <div>
-                        {address.street}, {address.ward}, {address.district}, {address.city}
+                        {address.street}, {address.ward}, {address.district},{" "}
+                        {address.city}
                       </div>
                     </div>
                     <Button

@@ -102,7 +102,7 @@ export default function AdminOrdersPage() {
       setOrders((current) =>
         current.map((order) => (order.id === orderId ? response.data : order)),
       );
-      toast.success("Da cap nhat trạng thái đơn hàng");
+      toast.success("Đã cập nhật trạng thái đơn hàng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update order");
     } finally {
@@ -117,7 +117,7 @@ export default function AdminOrdersPage() {
       setOrders((current) =>
         current.map((order) => (order.id === orderId ? response.data : order)),
       );
-      toast.success("Da cap nhat thanh toán");
+      toast.success("Đã cập nhật thanh toán");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update payment");
     } finally {
@@ -134,9 +134,9 @@ export default function AdminOrdersPage() {
             <span>/</span>
             <span className="font-medium text-primary">Đơn hàng</span>
           </nav>
-          <h1 className="text-3xl font-bold text-foreground">Quan ly đơn hàng</h1>
+          <h1 className="text-3xl font-bold text-foreground">Quản lý đơn hàng</h1>
           <p className="mt-2 text-muted-foreground">
-            Theo doi tien do, thanh toán va xu ly trạng thái giao hang.
+            Theo dõi tiến độ, thanh toán và xử lý trạng thái giao hàng.
           </p>
         </div>
         <div className="text-sm text-muted-foreground">
@@ -147,20 +147,20 @@ export default function AdminOrdersPage() {
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Cho xac nhan</span>
+            <span className="text-sm text-muted-foreground">Chờ xác nhận</span>
             <PackageCheck className="size-5 text-amber-600" />
           </div>
           <p className="mt-3 text-2xl font-semibold text-foreground">{visibleStats.pending}</p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Dang giao</span>
+            <span className="text-sm text-muted-foreground">Đang giao</span>
             <Truck className="size-5 text-blue-600" />
           </div>
           <p className="mt-3 text-2xl font-semibold text-foreground">{visibleStats.shipping}</p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <span className="text-sm text-muted-foreground">Giá tri hiển thị</span>
+          <span className="text-sm text-muted-foreground">Giá trị hiển thị</span>
           <p className="mt-3 text-2xl font-semibold text-foreground">
             {formatPrice(visibleStats.revenue)}
           </p>
@@ -173,7 +173,7 @@ export default function AdminOrdersPage() {
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="h-10 pl-9"
-              placeholder="Tim ma don, email, tên khach hoac so dien thoai"
+              placeholder="Tìm mã đơn, email, tên khách hoặc số điện thoại"
               value={search}
               onChange={(event) => {
                 setPage(1);
@@ -219,7 +219,7 @@ export default function AdminOrdersPage() {
               setPage(1);
             }}
           >
-            Xóa loc
+            Xóa lọc
           </Button>
         </div>
       </section>
@@ -231,7 +231,7 @@ export default function AdminOrdersPage() {
             <span>Khách hàng</span>
             <span>Trạng thái</span>
             <span>Thanh toán</span>
-            <span className="text-right">Tổng tien</span>
+            <span className="text-right">Tổng tiền</span>
           </div>
 
           {isLoading ? (
@@ -240,7 +240,7 @@ export default function AdminOrdersPage() {
             </div>
           ) : orders.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted-foreground">
-              Không có đơn hàng phu hop.
+              Không có đơn hàng phù hợp.
             </div>
           ) : (
             <div className="divide-y divide-border">

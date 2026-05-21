@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
   if (!overview) {
     return (
       <div className="mx-auto max-w-7xl rounded-lg border border-border bg-card p-10 text-center">
-        <p className="text-sm text-muted-foreground">Khong tai duoc du lieu dashboard.</p>
+        <p className="text-sm text-muted-foreground">Không tải được dữ liệu dashboard.</p>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
           </nav>
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
           <p className="mt-2 text-muted-foreground">
-            Theo doi doanh thu, đơn hàng, khach hang va ton kho can xu ly.
+            Theo dõi doanh thu, đơn hàng, khách hàng và tồn kho cần xử lý.
           </p>
         </div>
         <Button variant="outline" className="h-10" render={<Link href="/admin/orders" />}>
@@ -129,15 +129,15 @@ export default function AdminDashboardPage() {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          title="Doanh thu 30 ngay"
+          title="Doanh thu 30 ngày"
           metric={overview.metrics.revenue}
           icon={CircleDollarSign}
           currency
         />
-        <MetricCard title="Đơn hàng 30 ngay" metric={overview.metrics.orders} icon={ReceiptText} />
-        <MetricCard title="Khach moi" metric={overview.metrics.customers} icon={Users} />
+        <MetricCard title="Đơn hàng 30 ngày" metric={overview.metrics.orders} icon={ReceiptText} />
+        <MetricCard title="Khách mới" metric={overview.metrics.customers} icon={Users} />
         <MetricCard
-          title="Giá tri trung binh"
+          title="Giá trị trung bình"
           metric={overview.metrics.averageOrderValue}
           icon={PackageCheck}
           currency
@@ -148,8 +148,8 @@ export default function AdminDashboardPage() {
         <div className="rounded-lg border border-border bg-card p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-foreground">Can xu ly</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Trạng thái van hanh hien tai</p>
+              <h2 className="font-semibold text-foreground">Cần xử lý</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Trạng thái vận hành hiện tại</p>
             </div>
             <AlertTriangle className="size-5 text-amber-600" />
           </div>
@@ -158,14 +158,14 @@ export default function AdminDashboardPage() {
               href="/admin/orders?status=PENDING"
               className="flex items-center justify-between gap-4 py-4 transition-colors hover:text-primary"
             >
-              <p className="text-sm text-muted-foreground">Don cho xac nhan</p>
+              <p className="text-sm text-muted-foreground">Đơn chờ xác nhận</p>
               <p className="text-2xl font-semibold">{overview.metrics.pendingOrders}</p>
             </Link>
             <Link
               href="/admin/products"
               className="flex items-center justify-between gap-4 py-4 transition-colors hover:text-primary"
             >
-              <p className="text-sm text-muted-foreground">Sản phẩm sap het</p>
+              <p className="text-sm text-muted-foreground">Sản phẩm sắp hết</p>
               <p className="text-2xl font-semibold">{overview.metrics.lowStockCount}</p>
             </Link>
           </div>
@@ -174,8 +174,8 @@ export default function AdminDashboardPage() {
         <div className="rounded-lg border border-border bg-card p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-foreground">Doanh thu 7 ngay</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Cot cao nhat tuong ung ngay tot nhat</p>
+              <h2 className="font-semibold text-foreground">Doanh thu 7 ngày</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Cột cao nhất tương ứng ngày tốt nhất</p>
             </div>
             <Boxes className="size-5 text-primary" />
           </div>
@@ -199,7 +199,7 @@ export default function AdminDashboardPage() {
       <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border p-5">
-            <h2 className="font-semibold text-foreground">Đơn hàng moi</h2>
+            <h2 className="font-semibold text-foreground">Đơn hàng mới</h2>
             <Button variant="ghost" className="h-8" render={<Link href="/admin/orders" />}>
               Xem tất cả
             </Button>
@@ -252,12 +252,12 @@ export default function AdminDashboardPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-semibold">{product.quantitySold}</p>
-                    <p className="text-xs text-muted-foreground">da ban</p>
+                    <p className="text-xs text-muted-foreground">đã bán</p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="p-8 text-center text-sm text-muted-foreground">Chưa có du lieu ban hang.</p>
+              <p className="p-8 text-center text-sm text-muted-foreground">Chưa có dữ liệu bán hàng.</p>
             )}
           </div>
         </div>
@@ -265,7 +265,7 @@ export default function AdminDashboardPage() {
 
       <section className="rounded-lg border border-border bg-card">
         <div className="border-b border-border p-5">
-          <h2 className="font-semibold text-foreground">Can nhap hang</h2>
+          <h2 className="font-semibold text-foreground">Cần nhập hàng</h2>
         </div>
         <div className="divide-y divide-border">
           {overview.lowStockProducts.length ? (
@@ -283,7 +283,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <Badge variant={product.stock <= 3 ? "destructive" : "outline"} className="h-6 rounded-md">
-                  Ton {product.stock}
+                  Tồn {product.stock}
                 </Badge>
                 <Button variant="outline" className="h-8" render={<Link href={`/admin/products/${product.id}/edit`} />}>
                   Cập nhật
@@ -292,7 +292,7 @@ export default function AdminDashboardPage() {
             ))
           ) : (
             <p className="p-8 text-center text-sm text-muted-foreground">
-              Không có sản phẩm sap het hang.
+              Không có sản phẩm sắp hết hàng.
             </p>
           )}
         </div>

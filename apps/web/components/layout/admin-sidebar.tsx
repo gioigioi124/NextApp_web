@@ -50,7 +50,7 @@ export function AdminSidebar() {
 
       <div className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
         <div className="mb-4 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Quan ly
+          Quản lý
         </div>
 
         {menuItems.map((item) => {
@@ -76,7 +76,7 @@ export function AdminSidebar() {
           })}
 
         <div className="mb-4 mt-8 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          He thong
+          Hệ thống
         </div>
 
         <Link
@@ -97,13 +97,13 @@ export function AdminSidebar() {
           )}
         >
           <User className="size-5" />
-          <span className="font-medium">Profile</span>
+          <span className="font-medium">Hồ sơ cá nhân</span>
         </Link>
       </div>
 
       <div className="border-t border-border p-4">
         <div className="mb-2 flex items-center justify-between rounded-lg bg-muted/60 px-3 py-2">
-          <span className="text-sm font-medium text-muted-foreground">Giao dien</span>
+          <span className="text-sm font-medium text-muted-foreground">Giao diện</span>
           <ThemeToggle />
         </div>
         <button
