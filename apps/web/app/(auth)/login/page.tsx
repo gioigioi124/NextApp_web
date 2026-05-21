@@ -53,7 +53,15 @@ function LoginForm() {
       setAuth(response.data.user, response.data.tokens);
       await syncWithServer();
       toast.success("Đăng nhập thành công");
-      router.push(searchParams.get("next") || "/");
+      const nextUrl = searchParams.get("next");
+      if (nextUrl) {
+        router.push(nextUrl);
+      } else if (response.data.user.role === "ADMIN" || response.data.user.role === "STAFF") {
+        router.push("/admin");
+      } else {
+        router.push("/profile");
+      }
+      
       router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Đăng nhập thất bại");
@@ -66,7 +74,7 @@ function LoginForm() {
     <Card className="rounded-lg">
       <CardHeader>
         <CardTitle>Đăng nhập</CardTitle>
-        <CardDescription>Nhap email va mật khẩu de tiếp tục.</CardDescription>
+        <CardDescription>Nhập email và mật khẩu để tiếp tục.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

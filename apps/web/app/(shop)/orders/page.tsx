@@ -88,10 +88,10 @@ export default function OrdersPage() {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase text-secondary">Đơn hàng</p>
-          <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Theo doi đơn hàng</h1>
+          <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Theo dõi đơn hàng</h1>
         </div>
         <Button variant="outline" className="h-10" render={<Link href="/products" />}>
-          Tiep tuc mua sam
+          Tiếp tục mua sắm
         </Button>
       </div>
 
@@ -100,7 +100,7 @@ export default function OrdersPage() {
           <PackageCheck className="mx-auto size-12 text-muted-foreground" />
           <h2 className="mt-4 text-xl font-semibold text-foreground">Chưa có đơn hàng</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Cac đơn hàng sau khi checkout se xuat hien tai day.
+            Các đơn hàng sau khi thanh toán sẽ xuất hiện tại đây.
           </p>
         </section>
       ) : (
@@ -127,7 +127,7 @@ export default function OrdersPage() {
 
           {visibleOrders.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Không có đơn hàng trong trạng thái nay.
+              Không có đơn hàng trong trạng thái này.
             </div>
           ) : null}
 
@@ -167,7 +167,7 @@ export default function OrdersPage() {
                   <div className="min-w-0 text-sm">
                     <p className="truncate font-medium text-foreground">{order.items[0]?.name}</p>
                     <p className="mt-1 text-muted-foreground">
-                      Giao den {order.address.district}, {order.address.city}
+                      Giao đến {order.address.district}, {order.address.city}
                     </p>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export default function OrdersPage() {
                       ) : (
                         <XCircle className="mr-2 size-4" />
                       )}
-                      Hủy don
+                      Hủy đơn
                     </Button>
                   ) : null}
                   <Button className="h-10" render={<Link href={`/orders/${order.id}`} />}>

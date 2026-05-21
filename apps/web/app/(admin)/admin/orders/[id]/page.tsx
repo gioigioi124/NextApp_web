@@ -62,7 +62,7 @@ export default function AdminOrderDetailPage() {
     try {
       const response = await updateAdminOrderStatus(order.id, status);
       setOrder(response.data);
-      toast.success("Da cap nhat trạng thái đơn hàng");
+      toast.success("Đã cập nhật trạng thái đơn hàng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update order");
     } finally {
@@ -76,7 +76,7 @@ export default function AdminOrderDetailPage() {
     try {
       const response = await updateAdminPaymentStatus(order.id, paymentStatus);
       setOrder(response.data);
-      toast.success("Da cap nhat thanh toán");
+      toast.success("Đã cập nhật thanh toán");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to update payment");
     } finally {
@@ -106,7 +106,7 @@ export default function AdminOrderDetailPage() {
           <p className="text-sm font-semibold uppercase text-secondary">Chi tiết đơn hàng</p>
           <h1 className="mt-1 text-3xl font-bold text-foreground">{order.orderNumber}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Tao luc {new Date(order.createdAt).toLocaleString("vi-VN")}
+            Tạo lúc {new Date(order.createdAt).toLocaleString("vi-VN")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -147,17 +147,17 @@ export default function AdminOrderDetailPage() {
           <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex items-center gap-2">
               <ReceiptText className="size-5 text-primary" />
-              <h2 className="font-semibold text-foreground">Ghi chu</h2>
+              <h2 className="font-semibold text-foreground">Ghi chú</h2>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              {order.note || "Khách hàng khong de lai ghi chu."}
+              {order.note || "Khách hàng không để lại ghi chú."}
             </p>
           </div>
         </div>
 
         <aside className="h-fit space-y-4">
           <div className="rounded-lg border border-border bg-card p-5">
-            <h2 className="font-semibold text-foreground">Cập nhật xu ly</h2>
+            <h2 className="font-semibold text-foreground">Cập nhật xử lý</h2>
             <div className="mt-4 grid gap-3">
               <label className="grid gap-2 text-sm">
                 <span className="font-medium text-muted-foreground">Trạng thái đơn hàng</span>
@@ -192,7 +192,7 @@ export default function AdminOrderDetailPage() {
               {isUpdating ? (
                 <p className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Loader2 className="size-4 animate-spin" />
-                  Dang cap nhat
+                  Đang cập nhật
                 </p>
               ) : null}
             </div>
@@ -201,7 +201,7 @@ export default function AdminOrderDetailPage() {
           <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex items-center gap-2">
               <Truck className="size-5 text-primary" />
-              <h2 className="font-semibold text-foreground">Giao hang</h2>
+              <h2 className="font-semibold text-foreground">Giao hàng</h2>
             </div>
             <div className="mt-3 text-sm">
               <p className="font-medium">{order.address.fullName}</p>
@@ -222,15 +222,15 @@ export default function AdminOrderDetailPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5">
-            <h2 className="font-semibold text-foreground">Thanh tien</h2>
+            <h2 className="font-semibold text-foreground">Thành tiền</h2>
             <div className="mt-4 grid gap-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Tam tinh</span>
+                <span className="text-muted-foreground">Tạm tính</span>
                 <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Van chuyen</span>
-                <span>{order.shippingFee ? formatPrice(order.shippingFee) : "Mien phi"}</span>
+                <span className="text-muted-foreground">Vận chuyển</span>
+                <span>{order.shippingFee ? formatPrice(order.shippingFee) : "Miễn phí"}</span>
               </div>
               {order.discount > 0 ? (
                 <div className="flex justify-between text-primary">
@@ -241,7 +241,7 @@ export default function AdminOrderDetailPage() {
             </div>
             <Separator className="my-5" />
             <div className="flex justify-between font-semibold">
-              <span>Tổng cong</span>
+              <span>Tổng cộng</span>
               <span className="text-xl">{formatPrice(order.total)}</span>
             </div>
           </div>

@@ -23,7 +23,7 @@ import type { Address, CouponValidation } from "@/types/order";
 import { formatPrice } from "shared-utils";
 
 const steps = [
-  { label: "Dia chi", icon: MapPin },
+  { label: "Địa chỉ", icon: MapPin },
   { label: "Thanh toán", icon: CreditCard },
   { label: "Xác nhận", icon: ShieldCheck },
 ];
@@ -103,7 +103,7 @@ export default function CheckoutPage() {
 
   const addAddress = async () => {
     if (!addressForm.fullName || !addressForm.phone || !addressForm.street) {
-      toast.error("Vui long nhap day du thong tin địa chỉ");
+      toast.error("Vui lòng nhập đầy đủ thông tin địa chỉ");
       return;
     }
 
@@ -118,7 +118,7 @@ export default function CheckoutPage() {
       ]);
       setSelectedAddressId(response.data.id);
       setAddressForm(emptyAddress);
-      toast.success("Đã thêm địa chỉ giao hang");
+      toast.success("Đã thêm địa chỉ giao hàng");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to add address");
     } finally {
@@ -134,7 +134,7 @@ export default function CheckoutPage() {
     try {
       const response = await validateCoupon(code, totalPrice);
       setCoupon(response.data);
-      toast.success("Ma giam gia da duoc ap dung");
+      toast.success("Mã giảm giá đã được áp dụng");
     } catch (error) {
       setCoupon(null);
       toast.error(error instanceof Error ? error.message : "Coupon is invalid");
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
   const submitOrder = async () => {
     if (!selectedAddressId) {
       setStep(0);
-      toast.error("Vui long chon địa chỉ giao hang");
+      toast.error("Vui lòng chọn địa chỉ giao hàng");
       return;
     }
 
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
     }
 
     if (paymentMethod === "CARD") {
-      toast.error("Thanh toán the se duoc cau hinh o buoc Stripe sau");
+      toast.error("Thanh toán thẻ sẽ được cấu hình ở bước Stripe sau");
       return;
     }
 
@@ -243,7 +243,7 @@ export default function CheckoutPage() {
           {step === 0 ? (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground">Dia chi giao hang</h2>
+                <h2 className="text-xl font-semibold text-foreground">Địa chỉ giao hàng</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Chọn địa chỉ đã lưu hoặc thêm địa chỉ mới cho đơn hàng này.
                 </p>
@@ -264,7 +264,7 @@ export default function CheckoutPage() {
                     />
                     <span className="grid gap-1 text-sm">
                       <span className="font-semibold text-foreground">
-                        {address.fullName} {address.isDefault ? "(mac dinh)" : ""}
+                        {address.fullName} {address.isDefault ? "(mặc định)" : ""}
                       </span>
                       <span className="text-muted-foreground">{address.phone}</span>
                       <span>
@@ -279,14 +279,14 @@ export default function CheckoutPage() {
                 <h3 className="font-semibold text-foreground">Thêm địa chỉ mới</h3>
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   <Input
-                    placeholder="Ho va tên"
+                    placeholder="Họ và tên"
                     value={addressForm.fullName}
                     onChange={(event) =>
                       setAddressForm({ ...addressForm, fullName: event.target.value })
                     }
                   />
                   <Input
-                    placeholder="So dien thoai"
+                    placeholder="Số điện thoại"
                     value={addressForm.phone}
                     onChange={(event) =>
                       setAddressForm({ ...addressForm, phone: event.target.value })
@@ -294,26 +294,26 @@ export default function CheckoutPage() {
                   />
                   <Input
                     className="md:col-span-2"
-                    placeholder="Dia chi"
+                    placeholder="Địa chỉ"
                     value={addressForm.street}
                     onChange={(event) =>
                       setAddressForm({ ...addressForm, street: event.target.value })
                     }
                   />
                   <Input
-                    placeholder="Phuong/Xa"
+                    placeholder="Phường/Xã"
                     value={addressForm.ward}
                     onChange={(event) => setAddressForm({ ...addressForm, ward: event.target.value })}
                   />
                   <Input
-                    placeholder="Quan/Huyen"
+                    placeholder="Quận/Huyện"
                     value={addressForm.district}
                     onChange={(event) =>
                       setAddressForm({ ...addressForm, district: event.target.value })
                     }
                   />
                   <Input
-                    placeholder="Tinh/Thanh pho"
+                    placeholder="Tỉnh/Thành phố"
                     value={addressForm.city}
                     onChange={(event) => setAddressForm({ ...addressForm, city: event.target.value })}
                   />
@@ -325,7 +325,7 @@ export default function CheckoutPage() {
                         setAddressForm({ ...addressForm, isDefault: event.target.checked })
                       }
                     />
-                    Dat lam địa chỉ mac dinh
+                    Đặt làm địa chỉ mặc định
                   </label>
                 </div>
                 <Button className="mt-4 h-10" onClick={addAddress} disabled={isSavingAddress}>
@@ -336,7 +336,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-end">
                 <Button className="h-10 px-5" onClick={() => setStep(1)} disabled={!selectedAddressId}>
-                  Tiep tuc
+                  Tiếp tục
                 </Button>
               </div>
             </div>
@@ -345,9 +345,9 @@ export default function CheckoutPage() {
           {step === 1 ? (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground">Phuong thuc thanh toán</h2>
+                <h2 className="text-xl font-semibold text-foreground">Phương thức thanh toán</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  COD hoat dong ngay. Stripe Elements se duoc ket noi sau khi co key.
+                  COD hoạt động ngay. Stripe Elements sẽ được kết nối sau khi có key.
                 </p>
               </div>
 
@@ -361,9 +361,9 @@ export default function CheckoutPage() {
                     onChange={() => setPaymentMethod("COD")}
                   />
                   <span>
-                    <span className="font-semibold text-foreground">Thanh toán khi nhan hang</span>
+                    <span className="font-semibold text-foreground">Thanh toán khi nhận hàng</span>
                     <span className="mt-1 block text-sm text-muted-foreground">
-                      Xác nhận đơn hàng ngay va thanh toán cho don vi van chuyen.
+                      Xác nhận đơn hàng ngay và thanh toán cho đơn vị vận chuyển.
                     </span>
                   </span>
                 </label>
@@ -376,9 +376,9 @@ export default function CheckoutPage() {
                     onChange={() => setPaymentMethod("CARD")}
                   />
                   <span>
-                    <span className="font-semibold text-foreground">The tin dung / ghi no</span>
+                    <span className="font-semibold text-foreground">Thẻ tín dụng / ghi nợ</span>
                     <span className="mt-1 block text-sm text-muted-foreground">
-                      Endpoint PaymentIntent da san sang, UI Stripe se cau hinh sau.
+                      Endpoint PaymentIntent đã sẵn sàng, UI Stripe sẽ cấu hình sau.
                     </span>
                   </span>
                 </label>
@@ -389,7 +389,7 @@ export default function CheckoutPage() {
                   Quay lại
                 </Button>
                 <Button className="h-10 px-5" onClick={() => setStep(2)}>
-                  Tiep tuc
+                  Tiếp tục
                 </Button>
               </div>
             </div>
@@ -400,7 +400,7 @@ export default function CheckoutPage() {
               <div>
                 <h2 className="text-xl font-semibold text-foreground">Xác nhận đơn hàng</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Kiểm tra sản phẩm, địa chỉ va tổng tiền trước khi đặt hàng.
+                  Kiểm tra sản phẩm, địa chỉ và tổng tiền trước khi đặt hàng.
                 </p>
               </div>
 
@@ -436,11 +436,11 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <Label htmlFor="coupon">Ma giam gia</Label>
+                <Label htmlFor="coupon">Mã giảm giá</Label>
                 <div className="mt-2 flex gap-2">
                   <Input
                     id="coupon"
-                    placeholder="Nhap ma"
+                    placeholder="Nhập mã"
                     value={couponCode}
                     onChange={(event) => setCouponCode(event.target.value)}
                   />
@@ -451,17 +451,17 @@ export default function CheckoutPage() {
                 </div>
                 {coupon ? (
                   <p className="mt-2 text-sm font-medium text-primary">
-                    Da ap dung {coupon.code}: -{formatPrice(coupon.discount)}
+                    Đã áp dụng {coupon.code}: -{formatPrice(coupon.discount)}
                   </p>
                 ) : null}
               </div>
 
               <div>
-                <Label htmlFor="note">Ghi chu đơn hàng</Label>
+                <Label htmlFor="note">Ghi chú đơn hàng</Label>
                 <Textarea
                   id="note"
                   className="mt-2"
-                  placeholder="Vi du: giao gio hanh chinh"
+                  placeholder="Ví dụ: giao giờ hành chính"
                   value={note}
                   onChange={(event) => setNote(event.target.value)}
                 />
@@ -473,7 +473,7 @@ export default function CheckoutPage() {
                 </Button>
                 <Button className="h-10 px-5" onClick={submitOrder} disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                  Dat hang
+                  Đặt hàng
                 </Button>
               </div>
             </div>
@@ -481,15 +481,15 @@ export default function CheckoutPage() {
         </div>
 
         <aside className="h-fit rounded-lg border border-border bg-card p-5 shadow-sm lg:sticky lg:top-32">
-          <h2 className="text-lg font-semibold text-foreground">Tom tat</h2>
+          <h2 className="text-lg font-semibold text-foreground">Tóm tắt</h2>
           <div className="mt-5 grid gap-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Tam tinh</span>
+              <span className="text-muted-foreground">Tạm tính</span>
               <span className="font-medium">{formatPrice(totalPrice)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Van chuyen</span>
-              <span className="font-medium">{shippingFee ? formatPrice(shippingFee) : "Mien phi"}</span>
+              <span className="text-muted-foreground">Vận chuyển</span>
+              <span className="font-medium">{shippingFee ? formatPrice(shippingFee) : "Miễn phí"}</span>
             </div>
             {discount > 0 ? (
               <div className="flex justify-between text-primary">
@@ -500,12 +500,12 @@ export default function CheckoutPage() {
           </div>
           <Separator className="my-5" />
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-foreground">Tổng cong</span>
+            <span className="font-semibold text-foreground">Tổng cộng</span>
             <span className="text-xl font-bold text-foreground">{formatPrice(total)}</span>
           </div>
           <div className="mt-5 flex items-center gap-2 rounded-lg bg-muted p-3 text-xs text-muted-foreground">
             <Truck className="size-4" />
-            <span>Mien phi van chuyen cho don tu 500.000d.</span>
+            <span>Miễn phí vận chuyển cho đơn từ 500.000đ.</span>
           </div>
         </aside>
       </section>
