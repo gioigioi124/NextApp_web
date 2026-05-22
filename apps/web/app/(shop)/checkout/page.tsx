@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Check, CreditCard, Loader2, MapPin, PackageCheck, ShieldCheck, Truck } from "lucide-react";
+import { Check, ChevronRight, CreditCard, Loader2, MapPin, PackageCheck, ShieldCheck, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,7 @@ export default function CheckoutPage() {
   const totalPrice = useCartStore((state) => state.totalPrice);
   const fetchServerCart = useCartStore((state) => state.fetchServerCart);
   const clearCart = useCartStore((state) => state.clearCart);
+  const openCart = useCartStore((state) => state.openCart);
   const [step, setStep] = useState(0);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
@@ -203,62 +204,37 @@ export default function CheckoutPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold uppercase text-secondary">Checkout</p>
-          <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Hoàn tất đơn hàng</h1>
-        </div>
-        <Link
-          href="/cart"
-          className="inline-flex h-10 items-center rounded-lg border border-border px-4 text-sm font-semibold hover:bg-muted"
-        >
-          Quay lại giỏ hàng
-        </Link>
+      {/* Breadcrumb & Title */}
+      <div className="mb-12">
+        <nav className="mb-4 flex items-center gap-2 text-[13px] font-semibold tracking-wider text-muted-foreground">
+          <Link href="/cart" className="hover:text-primary">Giỏ hàng</Link>
+          <ChevronRight className="size-4" />
+          <span className="font-bold text-primary">Thanh toán</span>
+        </nav>
+        <h2 className="font-heading text-3xl font-semibold text-foreground sm:text-4xl">Hoàn tất đơn hàng</h2>
       </div>
 
-      <div className="mb-8 grid grid-cols-3 overflow-hidden rounded-lg border border-border">
-        {steps.map((item, index) => {
-          const Icon = item.icon;
-          const active = index === step;
-          const done = index < step;
-          return (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => setStep(index)}
-              className="flex min-h-16 items-center justify-center gap-2 border-r border-border px-2 text-sm font-semibold last:border-r-0 data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
-              data-active={active}
-            >
-              <span className="flex size-7 items-center justify-center rounded-full bg-muted text-foreground data-[done=true]:bg-secondary data-[done=true]:text-secondary-foreground">
-                {done ? <Check className="size-4" /> : <Icon className="size-4" />}
-              </span>
-              <span className="hidden sm:inline">{item.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 md:gap-8">
+        {/* Left Column: Checkout Form */}
+        <div className="space-y-10 lg:col-span-7">
+          {/* Section 1: Information */}
+          <section className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm md:p-8">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">1</div>
+              <h3 className="font-heading text-xl font-semibold text-foreground sm:text-2xl">Thông tin giao hàng</h3>
+            </div>
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="rounded-lg border border-border bg-card p-5">
-          {step === 0 ? (
             <div className="space-y-6">
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">Địa chỉ giao hàng</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Chọn địa chỉ đã lưu hoặc thêm địa chỉ mới cho đơn hàng này.
-                </p>
-              </div>
-
               <div className="grid gap-3">
                 {addresses.map((address) => (
                   <label
                     key={address.id}
-                    className="flex cursor-pointer gap-3 rounded-lg border border-border p-4 has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                    className="flex cursor-pointer gap-4 rounded-xl border border-border p-4 transition-all hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5"
                   >
                     <input
                       type="radio"
                       name="address"
-                      className="mt-1"
+                      className="mt-1 size-4 accent-primary"
                       checked={selectedAddressId === address.id}
                       onChange={() => setSelectedAddressId(address.id)}
                     />
@@ -275,240 +251,200 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="rounded-lg border border-dashed border-border p-4">
-                <h3 className="font-semibold text-foreground">Thêm địa chỉ mới</h3>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <Input
-                    placeholder="Họ và tên"
-                    value={addressForm.fullName}
-                    onChange={(event) =>
-                      setAddressForm({ ...addressForm, fullName: event.target.value })
-                    }
-                  />
-                  <Input
-                    placeholder="Số điện thoại"
-                    value={addressForm.phone}
-                    onChange={(event) =>
-                      setAddressForm({ ...addressForm, phone: event.target.value })
-                    }
-                  />
-                  <Input
-                    className="md:col-span-2"
-                    placeholder="Địa chỉ"
-                    value={addressForm.street}
-                    onChange={(event) =>
-                      setAddressForm({ ...addressForm, street: event.target.value })
-                    }
-                  />
-                  <Input
-                    placeholder="Phường/Xã"
-                    value={addressForm.ward}
-                    onChange={(event) => setAddressForm({ ...addressForm, ward: event.target.value })}
-                  />
-                  <Input
-                    placeholder="Quận/Huyện"
-                    value={addressForm.district}
-                    onChange={(event) =>
-                      setAddressForm({ ...addressForm, district: event.target.value })
-                    }
-                  />
-                  <Input
-                    placeholder="Tỉnh/Thành phố"
-                    value={addressForm.city}
-                    onChange={(event) => setAddressForm({ ...addressForm, city: event.target.value })}
-                  />
-                  <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <input
-                      type="checkbox"
-                      checked={addressForm.isDefault}
-                      onChange={(event) =>
-                        setAddressForm({ ...addressForm, isDefault: event.target.checked })
-                      }
-                    />
+              {/* Add New Address Form */}
+              <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
+                <h4 className="font-semibold text-foreground">Thêm địa chỉ mới</h4>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label className="mb-2 block text-[13px] font-semibold tracking-wider text-muted-foreground">Họ và tên</Label>
+                    <Input placeholder="Nhập họ và tên" className="h-12 rounded-lg bg-card" value={addressForm.fullName} onChange={(e) => setAddressForm({ ...addressForm, fullName: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label className="mb-2 block text-[13px] font-semibold tracking-wider text-muted-foreground">Số điện thoại</Label>
+                    <Input placeholder="0xxx xxx xxx" className="h-12 rounded-lg bg-card" value={addressForm.phone} onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label className="mb-2 block text-[13px] font-semibold tracking-wider text-muted-foreground">Địa chỉ chi tiết</Label>
+                    <Input placeholder="Số nhà, tên đường..." className="h-12 rounded-lg bg-card" value={addressForm.street} onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label className="mb-2 block text-[13px] font-semibold tracking-wider text-muted-foreground">Phường / Xã</Label>
+                    <Input placeholder="Phường/Xã" className="h-12 rounded-lg bg-card" value={addressForm.ward} onChange={(e) => setAddressForm({ ...addressForm, ward: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label className="mb-2 block text-[13px] font-semibold tracking-wider text-muted-foreground">Quận / Huyện</Label>
+                    <Input placeholder="Quận/Huyện" className="h-12 rounded-lg bg-card" value={addressForm.district} onChange={(e) => setAddressForm({ ...addressForm, district: e.target.value })} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label className="mb-2 block text-[13px] font-semibold tracking-wider text-muted-foreground">Tỉnh / Thành phố</Label>
+                    <Input placeholder="Tỉnh/Thành phố" className="h-12 rounded-lg bg-card" value={addressForm.city} onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })} />
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                    <input type="checkbox" className="size-4 rounded border-border text-primary accent-primary" checked={addressForm.isDefault} onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })} />
                     Đặt làm địa chỉ mặc định
                   </label>
+                  <Button onClick={addAddress} disabled={isSavingAddress} className="h-10">
+                    {isSavingAddress ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                    Lưu địa chỉ
+                  </Button>
                 </div>
-                <Button className="mt-4 h-10" onClick={addAddress} disabled={isSavingAddress}>
-                  {isSavingAddress ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                  Lưu địa chỉ
-                </Button>
-              </div>
-
-              <div className="flex justify-end">
-                <Button className="h-10 px-5" onClick={() => setStep(1)} disabled={!selectedAddressId}>
-                  Tiếp tục
-                </Button>
               </div>
             </div>
-          ) : null}
+          </section>
 
-          {step === 1 ? (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">Phương thức thanh toán</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  COD hoạt động ngay. Stripe Elements sẽ được kết nối sau khi có key.
-                </p>
-              </div>
-
-              <div className="grid gap-3">
-                <label className="flex cursor-pointer gap-3 rounded-lg border border-border p-4 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <input
-                    type="radio"
-                    name="payment"
-                    className="mt-1"
-                    checked={paymentMethod === "COD"}
-                    onChange={() => setPaymentMethod("COD")}
-                  />
-                  <span>
-                    <span className="font-semibold text-foreground">Thanh toán khi nhận hàng</span>
-                    <span className="mt-1 block text-sm text-muted-foreground">
-                      Xác nhận đơn hàng ngay và thanh toán cho đơn vị vận chuyển.
-                    </span>
-                  </span>
-                </label>
-                <label className="flex cursor-pointer gap-3 rounded-lg border border-border p-4 opacity-70 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <input
-                    type="radio"
-                    name="payment"
-                    className="mt-1"
-                    checked={paymentMethod === "CARD"}
-                    onChange={() => setPaymentMethod("CARD")}
-                  />
-                  <span>
-                    <span className="font-semibold text-foreground">Thẻ tín dụng / ghi nợ</span>
-                    <span className="mt-1 block text-sm text-muted-foreground">
-                      Endpoint PaymentIntent đã sẵn sàng, UI Stripe sẽ cấu hình sau.
-                    </span>
-                  </span>
-                </label>
-              </div>
-
-              <div className="flex justify-between">
-                <Button variant="outline" className="h-10 px-5" onClick={() => setStep(0)}>
-                  Quay lại
-                </Button>
-                <Button className="h-10 px-5" onClick={() => setStep(2)}>
-                  Tiếp tục
-                </Button>
-              </div>
+          {/* Section 2: Shipping */}
+          <section className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm md:p-8">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">2</div>
+              <h3 className="font-heading text-xl font-semibold text-foreground sm:text-2xl">Phương thức vận chuyển</h3>
             </div>
-          ) : null}
-
-          {step === 2 ? (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">Xác nhận đơn hàng</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Kiểm tra sản phẩm, địa chỉ và tổng tiền trước khi đặt hàng.
-                </p>
-              </div>
-
-              {selectedAddress ? (
-                <div className="rounded-lg border border-border p-4 text-sm">
-                  <p className="font-semibold text-foreground">{selectedAddress.fullName}</p>
-                  <p className="mt-1 text-muted-foreground">{selectedAddress.phone}</p>
-                  <p className="mt-1">
-                    {selectedAddress.street}, {selectedAddress.ward}, {selectedAddress.district},{" "}
-                    {selectedAddress.city}
-                  </p>
+            <div className="space-y-4">
+              <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-primary bg-primary/5 p-4 transition-all">
+                <div className="flex items-center gap-4">
+                  <input type="radio" name="shipping" className="size-4 accent-primary" checked readOnly />
+                  <div>
+                    <p className="font-bold text-foreground">Giao hàng tiêu chuẩn</p>
+                    <p className="text-sm text-muted-foreground">Dự kiến nhận hàng sau 2-4 ngày</p>
+                  </div>
                 </div>
-              ) : null}
+                <span className="font-bold text-primary">{shippingFee > 0 ? formatPrice(shippingFee) : "Miễn phí"}</span>
+              </label>
+            </div>
+          </section>
 
-              <div className="divide-y divide-border rounded-lg border border-border">
+          {/* Section 3: Payment */}
+          <section className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm md:p-8">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">3</div>
+              <h3 className="font-heading text-xl font-semibold text-foreground sm:text-2xl">Phương thức thanh toán</h3>
+            </div>
+            <div className="grid gap-4">
+              <label className="flex cursor-pointer items-center gap-4 rounded-xl border border-border p-4 transition-all hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input type="radio" name="payment" className="size-4 accent-primary" checked={paymentMethod === "COD"} onChange={() => setPaymentMethod("COD")} />
+                <div className="flex items-center gap-3">
+                  <PackageCheck className="size-6 text-primary" />
+                  <span className="font-medium text-foreground">Thanh toán khi nhận hàng (COD)</span>
+                </div>
+              </label>
+              <label className="flex cursor-pointer items-center gap-4 rounded-xl border border-border p-4 transition-all hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input type="radio" name="payment" className="size-4 accent-primary" checked={paymentMethod === "CARD"} onChange={() => setPaymentMethod("CARD")} />
+                <div className="flex items-center gap-3">
+                  <CreditCard className="size-6 text-secondary" />
+                  <span className="font-medium text-foreground">Thẻ Quốc tế (Visa, Mastercard)</span>
+                </div>
+              </label>
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column: Order Summary */}
+        <div className="lg:col-span-5">
+          <div className="space-y-6 lg:sticky lg:top-28">
+            <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-lg md:p-8">
+              <div className="mb-8 flex items-center justify-between">
+                <h3 className="font-heading text-xl font-semibold text-foreground sm:text-2xl">Tóm tắt đơn hàng</h3>
+                <button
+                  type="button"
+                  onClick={openCart}
+                  className="text-sm font-semibold text-secondary hover:underline"
+                >
+                  Sửa đơn hàng
+                </button>
+              </div>
+              
+              {/* Item List */}
+              <div className="hide-scrollbar mb-8 max-h-[400px] space-y-6 overflow-y-auto pr-2">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-3 p-3">
-                    <div className="size-16 shrink-0 overflow-hidden rounded-md bg-muted">
+                  <div key={item.id} className="flex gap-4">
+                    <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
                       {item.product.image ? (
                         <img src={item.product.image} alt={item.product.name} className="h-full w-full object-cover" />
                       ) : null}
+                      <span className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                        {item.quantity}
+                      </span>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="line-clamp-1 text-sm font-semibold text-foreground">{item.product.name}</p>
-                      {item.variant ? (
-                        <p className="text-xs text-muted-foreground">{item.variant.name}</p>
-                      ) : null}
-                      <p className="mt-1 text-xs text-muted-foreground">Số lượng: {item.quantity}</p>
+                    <div className="flex-1">
+                      <h4 className="mb-1 line-clamp-2 font-bold leading-tight text-foreground">{item.product.name}</h4>
+                      {item.variant ? <p className="text-sm text-muted-foreground">{item.variant.name}</p> : null}
+                      <div className="mt-1 flex items-baseline justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          {item.quantity} x {formatPrice(item.unitPrice)}
+                        </span>
+                        <span className="font-mono text-sm font-semibold text-primary">
+                          {formatPrice(item.subtotal)}
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-sm font-semibold text-foreground">{formatPrice(item.subtotal)}</p>
                   </div>
                 ))}
               </div>
 
-              <div>
-                <Label htmlFor="coupon">Mã giảm giá</Label>
-                <div className="mt-2 flex gap-2">
-                  <Input
-                    id="coupon"
-                    placeholder="Nhập mã"
-                    value={couponCode}
-                    onChange={(event) => setCouponCode(event.target.value)}
-                  />
-                  <Button variant="outline" className="h-10" onClick={applyCoupon} disabled={isApplyingCoupon}>
-                    {isApplyingCoupon ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                    Áp dụng
-                  </Button>
+              {/* Promo Code */}
+              <div className="mb-8 flex gap-3">
+                <Input placeholder="Mã giảm giá" className="h-12 flex-1 rounded-xl bg-surface" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
+                <Button className="h-12 rounded-xl px-6 font-bold" onClick={applyCoupon} disabled={isApplyingCoupon}>
+                  {isApplyingCoupon ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                  Áp dụng
+                </Button>
+              </div>
+
+              {/* Totals */}
+              <div className="space-y-4 border-t border-border pt-6">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Tạm tính</span>
+                  <span className="font-medium text-foreground">{formatPrice(totalPrice)}</span>
                 </div>
-                {coupon ? (
-                  <p className="mt-2 text-sm font-medium text-primary">
-                    Đã áp dụng {coupon.code}: -{formatPrice(coupon.discount)}
-                  </p>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Phí vận chuyển</span>
+                  <span className="font-medium text-foreground">{shippingFee ? formatPrice(shippingFee) : "Miễn phí"}</span>
+                </div>
+                {discount > 0 ? (
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Giảm giá</span>
+                    <span className="font-medium text-destructive">-{formatPrice(discount)}</span>
+                  </div>
                 ) : null}
+                <div className="flex items-center justify-between border-t border-border pt-4">
+                  <span className="font-heading text-xl font-semibold text-foreground">Tổng cộng</span>
+                  <div className="text-right">
+                    <span className="block font-mono text-2xl font-bold text-primary">{formatPrice(total)}</span>
+                    <span className="text-xs text-muted-foreground">(Đã bao gồm VAT)</span>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <Label htmlFor="note">Ghi chú đơn hàng</Label>
-                <Textarea
-                  id="note"
-                  className="mt-2"
-                  placeholder="Ví dụ: giao giờ hành chính"
-                  value={note}
-                  onChange={(event) => setNote(event.target.value)}
-                />
-              </div>
+              {/* Submit Button */}
+              <Button className="mt-8 h-14 w-full rounded-xl text-lg font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]" onClick={submitOrder} disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="mr-2 size-5 animate-spin" /> : null}
+                Hoàn tất thanh toán
+              </Button>
+              <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
+                <ShieldCheck className="size-4" />
+                Thanh toán an toàn & bảo mật 256-bit
+              </p>
+            </div>
 
-              <div className="flex justify-between">
-                <Button variant="outline" className="h-10 px-5" onClick={() => setStep(1)}>
-                  Quay lại
-                </Button>
-                <Button className="h-10 px-5" onClick={submitOrder} disabled={isSubmitting}>
-                  {isSubmitting ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                  Đặt hàng
-                </Button>
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col items-center p-3 text-center">
+                <Truck className="mb-2 size-6 text-primary" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Miễn phí giao hàng</span>
+              </div>
+              <div className="flex flex-col items-center p-3 text-center">
+                <ShieldCheck className="mb-2 size-6 text-primary" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Cam kết chính hãng</span>
+              </div>
+              <div className="flex flex-col items-center p-3 text-center">
+                <Check className="mb-2 size-6 text-primary" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Đổi trả 30 ngày</span>
               </div>
             </div>
-          ) : null}
+          </div>
         </div>
-
-        <aside className="h-fit rounded-lg border border-border bg-card p-5 shadow-sm lg:sticky lg:top-32">
-          <h2 className="text-lg font-semibold text-foreground">Tóm tắt</h2>
-          <div className="mt-5 grid gap-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tạm tính</span>
-              <span className="font-medium">{formatPrice(totalPrice)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Vận chuyển</span>
-              <span className="font-medium">{shippingFee ? formatPrice(shippingFee) : "Miễn phí"}</span>
-            </div>
-            {discount > 0 ? (
-              <div className="flex justify-between text-primary">
-                <span>Giảm giá</span>
-                <span className="font-medium">-{formatPrice(discount)}</span>
-              </div>
-            ) : null}
-          </div>
-          <Separator className="my-5" />
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-foreground">Tổng cộng</span>
-            <span className="text-xl font-bold text-foreground">{formatPrice(total)}</span>
-          </div>
-          <div className="mt-5 flex items-center gap-2 rounded-lg bg-muted p-3 text-xs text-muted-foreground">
-            <Truck className="size-4" />
-            <span>Miễn phí vận chuyển cho đơn từ 500.000đ.</span>
-          </div>
-        </aside>
-      </section>
+      </div>
     </main>
   );
 }
