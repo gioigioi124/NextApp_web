@@ -4,13 +4,10 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Image = {
-  url: string;
-  alt?: string;
-};
+import type { ProductImage } from "@/types/storefront";
 
 type ProductGalleryProps = {
-  images: Image[];
+  images: ProductImage[];
   productName: string;
 };
 
