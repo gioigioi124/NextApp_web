@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CheckCircle2, ChevronRight, ShieldCheck, Truck } from "lucide-react";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { ProductCard } from "@/components/product/product-card";
+import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductReviews } from "@/components/product/product-reviews";
 import { RatingStars } from "@/components/product/rating-stars";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -106,37 +107,7 @@ export default async function ProductDetailPage({
 
       <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-12">
         {/* Left Column: Image Gallery */}
-        <div className="flex flex-col-reverse gap-4 md:col-span-7 md:flex-row">
-          {/* Thumbnails */}
-          <div className="hide-scrollbar flex shrink-0 gap-3 overflow-x-auto md:w-20 md:flex-col md:overflow-y-auto">
-            {images.map((image, idx) => (
-              <div
-                key={image.url}
-                className={`aspect-square w-16 cursor-pointer overflow-hidden rounded-lg border md:w-full ${
-                  idx === 0
-                    ? "border-2 border-primary ring-offset-2"
-                    : "border-border transition-colors hover:border-primary"
-                }`}
-              >
-                <img
-                  src={image.url}
-                  alt={image.alt || `${product.name} thumbnail ${idx + 1}`}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-          {/* Main Image */}
-          <div className="group aspect-[4/5] flex-grow overflow-hidden rounded-xl bg-card shadow-lg">
-            {mainImage ? (
-              <img
-                src={mainImage}
-                alt={images[0]?.alt || product.name}
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-              />
-            ) : null}
-          </div>
-        </div>
+        <ProductGallery images={images} productName={product.name} />
 
         {/* Right Column: Sticky Info Panel */}
         <div className="md:col-span-5 lg:sticky lg:top-28">
