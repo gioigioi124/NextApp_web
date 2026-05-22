@@ -36,7 +36,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   const currentPrice = Number(product.salePrice || product.price);
 
   return (
-    <Card className="group overflow-hidden rounded-lg border border-border bg-card py-0 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+    <Card className="product-card group relative overflow-hidden rounded-xl border border-border/50 bg-card py-0 shadow-sm transition-all duration-300 hover:shadow-lg">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <Link href={`/products/${product.slug}`} aria-label={product.name}>
           {primaryImage ? (
@@ -45,7 +45,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
                 src={primaryImage}
                 alt={images[0]?.alt || product.name}
                 className={cn(
-                  "h-full w-full object-cover transition duration-500 group-hover:scale-105",
+                  "h-full w-full object-cover transition-transform duration-500 group-hover:scale-110",
                   hoverImage !== primaryImage && "group-hover:opacity-0",
                 )}
               />
@@ -53,36 +53,40 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
                 <img
                   src={hoverImage}
                   alt={images[1]?.alt || product.name}
-                  className="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
+                  className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100"
                 />
               ) : null}
             </>
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted">
-              <ImageIcon className="size-8 text-muted-foreground" />
+              <ImageIcon className="size-8 text-muted-foreground opacity-20" />
             </div>
           )}
         </Link>
 
-        <div className="absolute left-2 top-2 flex gap-1">
+        <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           {discount ? (
-            <Badge className="rounded-md bg-accent px-2 py-1 text-xs text-white">-{discount}%</Badge>
+            <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+              -{discount}%
+            </span>
           ) : null}
           {product.isFeatured ? (
-            <Badge className="rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground">Bán chạy</Badge>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+              New
+            </span>
           ) : null}
         </div>
 
         <WishlistButton
           productId={product.id}
           iconOnly
-          className="absolute right-2 top-2 rounded-full bg-white/90 text-foreground shadow-sm hover:bg-white"
+          className="absolute right-3 top-3 rounded-full bg-white/90 text-muted-foreground shadow-sm hover:text-destructive hover:bg-white active:scale-90"
         />
 
-        <div className="absolute inset-x-2 bottom-2 translate-y-14 opacity-0 transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="absolute inset-x-3 bottom-3 translate-y-10 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <Button
             type="button"
-            className="h-10 w-full rounded-lg bg-primary text-primary-foreground shadow-lg"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-xs font-bold text-white shadow-lg active:scale-95"
             onClick={async () => {
               try {
                 await addItem(product, 1);
@@ -93,33 +97,39 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             }}
             disabled={product.stock <= 0}
           >
-            <ShoppingBag className="size-4" />
-            {product.stock > 0 ? "Thêm vào giỏ" : "Hết hàng"}
+            <ShoppingBag className="size-[18px]" />
+            {product.stock > 0 ? "THÊM VÀO GIỎ" : "HẾT HÀNG"}
           </Button>
         </div>
       </div>
 
-      <CardContent className={cn("space-y-2 p-3", compact && "p-2")}>
-        <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-xs font-semibold uppercase text-muted-foreground">
-            {product.category?.name || product.tags?.[0] || "Lumina"}
-          </p>
-          <div className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-            <Star className="size-3 fill-amber-400 text-amber-400" />
-            <span>{(product.averageRating || 0).toFixed(1)}</span>
-            <span>({product.reviewCount || 0})</span>
-          </div>
-        </div>
-
+      <CardContent className={cn("p-4", compact && "p-3")}>
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          {product.category?.name || product.tags?.[0] || "Lumina Premium"}
+        </p>
+        
         <Link
           href={`/products/${product.slug}`}
-          className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-foreground transition hover:text-primary"
+          className="mb-2 line-clamp-2 min-h-[3rem] text-sm font-semibold text-foreground transition-colors group-hover:text-primary"
         >
           {product.name}
         </Link>
 
-        <div className="flex flex-wrap items-baseline gap-2">
-          <span className="text-base font-bold text-foreground">{formatPrice(currentPrice)}</span>
+        <div className="mb-2 flex items-center gap-1">
+          <div className="flex shrink-0 items-center text-warning">
+            <Star className="size-[14px] fill-amber-400 text-amber-400" />
+            <Star className="size-[14px] fill-amber-400 text-amber-400" />
+            <Star className="size-[14px] fill-amber-400 text-amber-400" />
+            <Star className="size-[14px] fill-amber-400 text-amber-400" />
+            <Star className="size-[14px] fill-amber-400 text-amber-400 opacity-30" />
+          </div>
+          <span className="text-[11px] font-medium text-muted-foreground">
+            ({product.reviewCount || 0})
+          </span>
+        </div>
+
+        <div className="flex flex-col">
+          <span className="text-base font-bold text-primary">{formatPrice(currentPrice)}</span>
           {product.salePrice ? (
             <span className="text-sm text-muted-foreground line-through">{formatPrice(Number(product.price))}</span>
           ) : null}

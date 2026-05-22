@@ -87,15 +87,15 @@ export default async function CategoryPage({
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-          <div className="hidden lg:block">
-            <ShopFilters categories={categories} query={query} basePath={`/categories/${slug}`} />
-          </div>
-          <section>
-            <ShopMobileFilters categories={categories} query={query} basePath={`/categories/${slug}`} />
+        <div className="flex flex-col gap-8 md:flex-row">
+          <ShopFilters categories={categories} query={query} basePath={`/categories/${slug}`} activeCategory={slug} />
+          <section className="flex-1">
+            <ShopMobileFilters categories={categories} query={query} basePath={`/categories/${slug}`} activeCategory={slug} />
             <ShopToolbar total={categoryResponse.meta.total} />
             <ProductGrid products={category.products} />
-            <Pagination totalPages={categoryResponse.meta.totalPages} currentPage={categoryResponse.meta.page} />
+            <div className="mt-12 flex items-center justify-center">
+              <Pagination totalPages={categoryResponse.meta.totalPages} currentPage={categoryResponse.meta.page} />
+            </div>
           </section>
         </div>
       </main>

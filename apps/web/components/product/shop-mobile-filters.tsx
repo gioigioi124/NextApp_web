@@ -16,9 +16,10 @@ type ShopMobileFiltersProps = {
   categories: Category[];
   query: ProductQuery;
   basePath: string;
+  activeCategory?: string;
 };
 
-export function ShopMobileFilters({ categories, query, basePath }: ShopMobileFiltersProps) {
+export function ShopMobileFilters({ categories, query, basePath, activeCategory }: ShopMobileFiltersProps) {
   return (
     <div className="mb-4 lg:hidden">
       <Sheet>
@@ -35,7 +36,7 @@ export function ShopMobileFilters({ categories, query, basePath }: ShopMobileFil
             <SheetTitle>Bộ lọc sản phẩm</SheetTitle>
           </SheetHeader>
           <div className="p-4">
-            <ShopFilters categories={categories} query={query} basePath={basePath} />
+            <ShopFilters categories={categories} query={query} basePath={basePath} activeCategory={activeCategory} />
           </div>
         </SheetContent>
       </Sheet>
