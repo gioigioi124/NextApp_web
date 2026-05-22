@@ -36,7 +36,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   const currentPrice = Number(product.salePrice || product.price);
 
   return (
-    <Card className="product-card group relative overflow-hidden rounded-xl border border-border/50 bg-card py-0 shadow-sm transition-all duration-300 hover:shadow-lg">
+    <Card className="product-card group relative flex flex-col gap-0 overflow-hidden rounded-xl border border-border/50 bg-card py-0 shadow-sm transition-all duration-300 hover:shadow-lg">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <Link href={`/products/${product.slug}`} aria-label={product.name}>
           {primaryImage ? (
@@ -110,7 +110,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         
         <Link
           href={`/products/${product.slug}`}
-          className="mb-2 line-clamp-2 min-h-[3rem] text-sm font-semibold text-foreground transition-colors group-hover:text-primary"
+          className="mb-2 line-clamp-2 min-h-10 text-sm font-semibold text-foreground transition-colors group-hover:text-primary"
         >
           {product.name}
         </Link>

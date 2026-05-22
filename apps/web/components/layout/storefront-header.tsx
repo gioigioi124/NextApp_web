@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowRight,
   Heart,
@@ -51,6 +51,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1
 
 export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -208,85 +209,91 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
             </SheetContent>
           </Sheet>
 
-          <Link href="/" className="flex shrink-0 flex-col leading-none">
-            <span className="font-heading text-xl font-bold tracking-wide text-primary">LUMINA</span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-              Bedding
-            </span>
+          <Link href="/" className="font-heading text-2xl font-bold tracking-tight text-primary md:text-3xl">
+            LUMINA BEDDING
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            <Link href="/products" className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted">
-              Sản phẩm
+          <nav className="hidden items-center gap-6 text-base font-medium md:flex">
+            <Link
+              href="/products"
+              className={
+                pathname === "/products"
+                  ? "border-b-2 border-primary pb-1 font-bold text-primary"
+                  : "text-muted-foreground transition-colors duration-200 hover:text-primary"
+              }
+            >
+              Tất cả
             </Link>
-            {popularCategories.slice(0, 4).map((category) => (
-              <Link
-                key={category.id}
-                href={`/categories/${category.slug}`}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-              >
-                {category.name}
-              </Link>
-            ))}
+            {popularCategories.slice(0, 5).map((category) => {
+              const isActive = pathname === `/categories/${category.slug}`;
+              return (
+                <Link
+                  key={category.id}
+                  href={`/categories/${category.slug}`}
+                  className={
+                    isActive
+                      ? "border-b-2 border-primary pb-1 font-bold text-primary"
+                      : "text-muted-foreground transition-colors duration-200 hover:text-primary"
+                  }
+                >
+                  {category.name}
+                </Link>
+              );
+            })}
           </nav>
 
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="ml-auto hidden h-10 min-w-64 items-center gap-3 rounded-lg border border-input bg-card px-3 text-left text-sm text-muted-foreground shadow-sm transition hover:bg-muted md:flex"
-          >
-            <Search className="size-4" />
-            <span className="flex-1">Tìm chăn ga, nệm, gối...</span>
-            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 text-[11px]">⌘K</kbd>
-          </button>
-
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(true)} aria-label="Tìm kiếm">
-            <Search className="size-5" />
-          </Button>
-          <ThemeToggle className="hidden sm:inline-flex" />
-          <Link
-            href="/wishlist"
-            className="relative inline-flex size-8 items-center justify-center rounded-lg hover:bg-muted"
-            aria-label="Yêu thích"
-          >
-            <Heart className="size-5" />
-            {wishlistTotalItems > 0 ? (
-              <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
-                {wishlistTotalItems}
-              </span>
-            ) : null}
-          </Link>
-          <Button variant="ghost" size="icon" aria-label="Giỏ hàng" className="relative" onClick={openCart}>
-            <ShoppingBag className="size-5" />
-            <span
-              key={cartChangedAt}
-              className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white data-[active=true]:animate-bounce"
-              data-active={cartChangedAt > 0}
+          <div className="ml-auto flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="hidden h-9 items-center gap-2 rounded-full bg-muted px-4 py-1.5 transition-all focus-within:border-primary lg:flex"
             >
-              {cartTotalItems}
-            </span>
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="Tài khoản" render={<Link href="/profile" />}>
-            <User className="size-5" />
-          </Button>
-        </div>
+              <Search className="size-4 text-muted-foreground" />
+              <span className="w-48 text-left text-sm text-muted-foreground">Tìm sản phẩm...</span>
+            </button>
 
-        <div className="no-scrollbar mx-auto flex max-w-7xl gap-2 overflow-x-auto border-t border-border px-4 py-2 sm:px-6 lg:px-8">
-          <Link
-            href="/products"
-            className="shrink-0 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground"
-          >
-            Tất cả
-          </Link>
-          {popularCategories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/categories/${category.slug}`}
-              className="shrink-0 rounded-full bg-card px-4 py-1.5 text-sm font-medium text-muted-foreground ring-1 ring-border hover:text-foreground"
-            >
-              {category.name}
-            </Link>
-          ))}
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(true)} aria-label="Tìm kiếm">
+              <Search className="size-5" />
+            </Button>
+            
+            <div className="flex gap-3">
+              <ThemeToggle className="hidden sm:inline-flex" />
+              <Link
+                href="/wishlist"
+                className="relative flex cursor-pointer items-center justify-center text-muted-foreground transition-transform hover:text-primary active:scale-95"
+                aria-label="Yêu thích"
+              >
+                <Heart className="size-[22px]" />
+                {wishlistTotalItems > 0 ? (
+                  <span className="absolute -right-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+                    {wishlistTotalItems}
+                  </span>
+                ) : null}
+              </Link>
+              <button
+                type="button"
+                onClick={openCart}
+                className="relative flex cursor-pointer items-center justify-center text-muted-foreground transition-transform hover:text-primary active:scale-95"
+                aria-label="Giỏ hàng"
+              >
+                <ShoppingBag className="size-[22px]" />
+                <span
+                  key={cartChangedAt}
+                  className="absolute -right-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white data-[active=true]:animate-bounce"
+                  data-active={cartChangedAt > 0}
+                >
+                  {cartTotalItems}
+                </span>
+              </button>
+              <Link
+                href="/profile"
+                className="flex cursor-pointer items-center justify-center text-muted-foreground transition-transform hover:text-primary active:scale-95"
+                aria-label="Tài khoản"
+              >
+                <User className="size-[22px]" />
+              </Link>
+            </div>
+          </div>
         </div>
       </header>
 

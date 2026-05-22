@@ -70,22 +70,6 @@ export default async function CategoryPage({
 
   return (
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 overflow-hidden rounded-lg border border-border bg-card shadow-sm">
-          <div className="grid items-center gap-6 md:grid-cols-[1fr_360px]">
-            <div className="p-6 md:p-8">
-              <p className="text-sm font-semibold uppercase tracking-wide text-secondary">Danh mục</p>
-              <h1 className="[font-family:var(--font-heading)] mt-2 text-4xl font-semibold text-foreground">
-                {category.name}
-              </h1>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                {category.description || "Các sản phẩm được chọn lọc theo cùng nhu cầu sử dụng và phong cách phòng ngủ."}
-              </p>
-            </div>
-            {category.image ? (
-              <img src={category.image} alt={category.name} className="h-64 w-full object-cover md:h-full" />
-            ) : null}
-          </div>
-        </div>
 
         <div className="flex flex-col gap-8 md:flex-row">
           <ShopFilters categories={categories} query={query} basePath={`/categories/${slug}`} activeCategory={slug} />
