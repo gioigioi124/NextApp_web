@@ -19,7 +19,7 @@ export class CategoriesService {
   constructor(private prisma: PrismaService) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-    const slug = slugify(createCategoryDto.name, { lower: true });
+    const slug = slugify(createCategoryDto.name, { lower: true, locale: 'vi' });
 
     const existing = await this.prisma.category.findUnique({ where: { slug } });
     if (existing) {
@@ -147,7 +147,7 @@ export class CategoriesService {
 
     let slug = category.slug;
     if (updateCategoryDto.name) {
-      slug = slugify(updateCategoryDto.name, { lower: true });
+      slug = slugify(updateCategoryDto.name, { lower: true, locale: 'vi' });
     }
 
     return this.prisma.category.update({

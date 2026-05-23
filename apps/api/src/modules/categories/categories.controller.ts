@@ -13,7 +13,7 @@ export class CategoriesController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'STAFF')
-  create(@Body() createCategoryDto: CreateCategoryDto) {
+  create(@Body() createCategoryDto: any) {
     return this.categoriesService.create(createCategoryDto);
   }
 
@@ -54,7 +54,7 @@ export class CategoriesController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'STAFF')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  update(@Param('id') id: string, @Body() updateCategoryDto: any) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 

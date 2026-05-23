@@ -13,7 +13,7 @@ export class ProductsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'STAFF')
-  create(@Body() createProductDto: CreateProductDto) {
+  create(@Body() createProductDto: any) {
     return this.productsService.create(createProductDto);
   }
 
@@ -29,6 +29,7 @@ export class ProductsController {
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
     @Query('rating') rating?: string,
+    @Query('all') all?: string,
   ) {
     return this.productsService.findAll({
       page,
@@ -41,6 +42,7 @@ export class ProductsController {
       minPrice,
       maxPrice,
       rating,
+      all,
     });
   }
 
@@ -67,7 +69,7 @@ export class ProductsController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'STAFF')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  update(@Param('id') id: string, @Body() updateProductDto: any) {
     return this.productsService.update(id, updateProductDto);
   }
 

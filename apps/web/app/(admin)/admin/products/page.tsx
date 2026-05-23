@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 async function getProducts(params: { page?: string; search?: string; categoryId?: string }): Promise<{ data: Product[], meta: any }> {
   try {
     const token = (await cookies()).get("auth-token")?.value;
-    const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/products?${query}`, {
+    const query = new URLSearchParams(params as Record<string, string>).toString();
+    const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/products?${query}&all=true`, {
       cache: 'no-store',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });

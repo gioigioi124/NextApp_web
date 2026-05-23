@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getClientAuthHeaders } from "@/lib/auth-headers";
+import { apiClient } from "@/lib/api-client";
 
 export type Product = {
   id: string;
@@ -49,17 +49,14 @@ const ProductActions = ({ product }: { product: Product }) => {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${product.id}`, {
+      await apiClient.fetch(`/products/${product.id}`, {
         method: "DELETE",
-        headers: getClientAuthHeaders(),
       });
-
-      if (!res.ok) throw new Error("Xóa thất bại");
       
       toast.success("Đã xóa sản phẩm thành công!");
       router.refresh();
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi xóa sản phẩm.");
+    } catch (error: any) {
+      toast.error(error.message || "Có lỗi xảy ra khi xóa sản phẩm.");
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);

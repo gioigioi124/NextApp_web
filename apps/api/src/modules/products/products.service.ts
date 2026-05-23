@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import slugify from 'slugify';
 
@@ -13,6 +13,7 @@ type ProductQuery = {
   minPrice?: string;
   maxPrice?: string;
   rating?: string;
+  all?: boolean | string;
 };
 
 @Injectable()
@@ -21,7 +22,7 @@ export class ProductsService {
 
   async create(createProductDto: any) {
     const slug =
-      slugify(createProductDto.name, { lower: true }) +
+      slugify(createProductDto.name, { lower: true, locale: 'vi' }) +
       '-' +
       Date.now().toString().slice(-4);
 
@@ -90,12 +91,16 @@ export class ProductsService {
     const maxPrice = query.maxPrice ? Number(query.maxPrice) : undefined;
 
     const where: any = {
-      isActive: true,
       OR: [
         { name: { contains: search, mode: 'insensitive' } },
         { sku: { contains: search, mode: 'insensitive' } },
       ],
     };
+
+    const isAll = query.all === 'true' || query.all === true || query.all === '1';
+    if (!isAll) {
+      where.isActive = true;
+    }
 
     if (query.categoryId) {
       where.categoryId = query.categoryId;
@@ -278,10 +283,28 @@ export class ProductsService {
   }
 
   async remove(id: string) {
-    await this.findOne(id);
-    await this.prisma.product.delete({
+    const product = await this.prisma.product.findUnique({
       where: { id },
+      include: { orderItems: { take: 1 } },
     });
+
+    if (!product) {
+      throw new NotFoundException('Không tìm thấy sản phẩm');
+    }
+
+    if (product.orderItems.length > 0) {
+      throw new BadRequestException(
+        'Không thể xóa sản phẩm đã có trong đơn hàng. Vui lòng chuyển trạng thái sang Ngừng kinh doanh.'
+      );
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.cartItem.deleteMany({ where: { productId: id } }),
+      this.prisma.wishlistItem.deleteMany({ where: { productId: id } }),
+      this.prisma.review.deleteMany({ where: { productId: id } }),
+      this.prisma.product.delete({ where: { id } }),
+    ]);
+
     return { message: 'Đã xóa sản phẩm' };
   }
 

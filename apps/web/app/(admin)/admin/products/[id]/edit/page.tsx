@@ -15,7 +15,7 @@ import { productSchema, ProductInput } from "shared-utils";
 import { toast } from "sonner";
 import { TagInput } from "@/components/ui/tag-input";
 import { ImageUpload } from "@/components/product/image-upload";
-import { getClientAuthHeaders } from "@/lib/auth-headers";
+import { apiClient } from "@/lib/api-client";
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -43,13 +43,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`, {
-          headers: getClientAuthHeaders(),
-        });
-        if (res.ok) {
-          const json = await res.json();
-          setCategories(json.data || []);
-        }
+        const json = await apiClient.fetch<any>(`/categories`);
+        setCategories(json.data || []);
       } catch (error) {
         console.error("Fetch categories error:", error);
       }
@@ -81,11 +76,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${id}`, {
-          headers: getClientAuthHeaders(),
-        });
-        if (!res.ok) throw new Error("Failed to fetch");
-        const json = await res.json();
+        const json = await apiClient.fetch<any>(`/products/${id}`);
         const product = json.data;
 
         // Reconstruct attributes from variant options when not explicitly stored
@@ -120,7 +111,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           description: product.description,
           price: Number(product.price),
           stock: product.stock,
-          categoryId: product.categoryId,
+          categoryId: product.categoryId || "",
           status: product.isActive ? 'active' : 'draft',
           sku: product.sku,
           images: product.images?.map((img: any) => img.url) || [],
@@ -250,16 +241,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         }))
       };
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products/${id}`, {
+      await apiClient.fetch(`/products/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...getClientAuthHeaders() },
         body: JSON.stringify(payload)
       });
-      
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        throw new Error(errBody?.message || `HTTP ${res.status}`);
-      }
       
       toast.success("Đã cập nhật sản phẩm thành công!");
       router.push("/admin/products");
@@ -333,8 +318,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-muted-foreground uppercase">DANH MỤC</Label>
                     <Select
-                      items={categoryItems}
-                      value={watch("categoryId") || null}
+                      value={watch("categoryId") || undefined}
                       onValueChange={(v) => setValue("categoryId", v ? String(v) : "", { shouldValidate: true })}
                     >
                       <SelectTrigger className="h-12 bg-input">
@@ -425,16 +409,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                           const formData = new FormData();
                                           formData.append('file', file);
                                           try {
-                                            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/upload`, {
+                                            const data = await apiClient.fetch<any>(`/upload`, {
                                               method: 'POST',
-                                              headers: getClientAuthHeaders(),
                                               body: formData
                                             });
-                                            if (res.ok) {
-                                              const data = await res.json();
-                                              handleVariantChange(idx, 'image', data.url);
-                                              toast.success("Đã tải ảnh biến thể");
-                                            }
+                                            handleVariantChange(idx, 'image', data.url);
+                                            toast.success("Đã tải ảnh biến thể");
                                           } catch (err) {
                                             toast.error("Lỗi khi tải ảnh");
                                           }
@@ -518,7 +498,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-muted-foreground uppercase">TRẠNG THÁI</Label>
                   <Select
-                    items={statusItems}
                     value={watch("status")}
                     onValueChange={(v) => setValue('status', v as "active" | "draft" | "out")}
                   >

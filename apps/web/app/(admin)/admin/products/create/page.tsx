@@ -15,7 +15,7 @@ import { productSchema, ProductInput } from "shared-utils";
 import { toast } from "sonner";
 import { TagInput } from "@/components/ui/tag-input";
 import { ImageUpload } from "@/components/product/image-upload";
-import { getClientAuthHeaders } from "@/lib/auth-headers";
+import { apiClient } from "@/lib/api-client";
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -39,13 +39,8 @@ export default function CreateProductPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/categories`, {
-          headers: getClientAuthHeaders(),
-        });
-        if (res.ok) {
-          const json = await res.json();
-          setCategories(json.data || []);
-        }
+        const json = await apiClient.fetch<any>(`/categories`);
+        setCategories(json.data || []);
       } catch (error) {
         console.error("Fetch categories error:", error);
       }
@@ -165,12 +160,8 @@ export default function CreateProductPage() {
   const onSubmit = async (data: ProductInput) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/products`, {
+      await apiClient.fetch(`/products`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...getClientAuthHeaders(),
-        },
         body: JSON.stringify({
           ...data,
           attributes: attributes.filter(a => a.name.trim() !== "" && a.values.length > 0),
@@ -181,10 +172,6 @@ export default function CreateProductPage() {
           }))
         })
       });
-      
-      if (!res.ok) {
-        throw new Error("Lỗi khi thêm sản phẩm");
-      }
       
       toast.success("Đã thêm sản phẩm thành công!");
       router.push("/admin/products");
@@ -247,8 +234,7 @@ export default function CreateProductPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-muted-foreground uppercase">DANH MỤC</Label>
                     <Select
-                      items={categoryItems}
-                      value={watch("categoryId") || null}
+                      value={watch("categoryId") || undefined}
                       onValueChange={(v) => setValue("categoryId", v ? String(v) : "", { shouldValidate: true })}
                     >
                       <SelectTrigger className="h-12 bg-input">
@@ -339,16 +325,12 @@ export default function CreateProductPage() {
                                           const formData = new FormData();
                                           formData.append('file', file);
                                           try {
-                                            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/upload`, {
+                                            const data = await apiClient.fetch<any>(`/upload`, {
                                               method: 'POST',
-                                              headers: getClientAuthHeaders(),
                                               body: formData
                                             });
-                                            if (res.ok) {
-                                              const data = await res.json();
-                                              handleVariantChange(idx, 'image', data.url);
-                                              toast.success("Đã tải ảnh biến thể");
-                                            }
+                                            handleVariantChange(idx, 'image', data.url);
+                                            toast.success("Đã tải ảnh biến thể");
                                           } catch (err) {
                                             toast.error("Lỗi khi tải ảnh");
                                           }
@@ -447,7 +429,6 @@ export default function CreateProductPage() {
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-muted-foreground uppercase">TRẠNG THÁI</Label>
                   <Select
-                    items={statusItems}
                     value={watch("status")}
                     onValueChange={(v) => setValue('status', v as "active" | "draft" | "out")}
                   >
