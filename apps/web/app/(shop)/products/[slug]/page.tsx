@@ -77,7 +77,32 @@ export default async function ProductDetailPage({
     category: product.category?.slug,
     limit: "4",
   });
-  const images = product.images?.length ? product.images : [];
+  let images = product.images?.length ? [...product.images] : [];
+  
+  if ((product.variants?.length ?? 0) > 0) {
+    const allVariantImages: string[] = [];
+    (product.variants || []).forEach((v: any) => {
+      if (v.options?.images && Array.isArray(v.options.images)) {
+        allVariantImages.push(...v.options.images);
+      } else if (v.image) {
+        allVariantImages.push(v.image);
+      }
+    });
+    
+    const uniqueVariantImages = Array.from(new Set(allVariantImages)).filter(Boolean);
+    
+    uniqueVariantImages.forEach((url, idx) => {
+      if (!images.find(img => img.url === url)) {
+        images.push({
+          id: `variant-img-${idx}`,
+          url: url as string,
+          alt: `${product.name} variant`,
+          position: images.length
+        } as any);
+      }
+    });
+  }
+
   const mainImage = images[0]?.url;
   const currentPrice = Number(product.salePrice || product.price);
   const originalPrice = Number(product.price);

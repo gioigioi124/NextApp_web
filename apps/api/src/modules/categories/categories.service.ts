@@ -38,13 +38,13 @@ export class CategoriesService {
     const categories = await this.prisma.category.findMany({
       include: {
         _count: {
-          select: { products: true },
+          select: { products: { where: { isActive: true } } },
         },
         parent: true,
         children: {
           include: {
             _count: {
-              select: { products: true },
+              select: { products: { where: { isActive: true } } },
             },
           },
           orderBy: { name: 'asc' },
@@ -80,7 +80,7 @@ export class CategoriesService {
         parent: true,
         children: true,
         _count: {
-          select: { products: true },
+          select: { products: { where: { isActive: true } } },
         },
       },
     });

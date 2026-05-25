@@ -41,6 +41,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { clearCacheByTag } from "@/app/actions";
+
 const ProductActions = ({ product }: { product: Product }) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -54,6 +56,8 @@ const ProductActions = ({ product }: { product: Product }) => {
       });
       
       toast.success("Đã xóa sản phẩm thành công!");
+      await clearCacheByTag("products");
+      await clearCacheByTag("categories");
       router.refresh();
     } catch (error: any) {
       toast.error(error.message || "Có lỗi xảy ra khi xóa sản phẩm.");
