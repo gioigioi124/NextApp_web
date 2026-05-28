@@ -8,6 +8,7 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductReviews } from "@/components/product/product-reviews";
 import { RatingStars } from "@/components/product/rating-stars";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { getProductBySlug, getProducts } from "@/services/catalog.service";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 import { formatPrice } from "shared-utils";
@@ -209,11 +210,13 @@ export default async function ProductDetailPage({
             {product.description}
             {/* Extended Static Description Mockup from HTML if needed */}
             <div className="my-10 grid gap-8 md:grid-cols-2">
-              <div className="overflow-hidden rounded-xl shadow-md">
-                <img
+              <div className="relative min-h-72 overflow-hidden rounded-xl shadow-md">
+                <OptimizedImage
                   className="h-full w-full object-cover"
                   alt="Quality detail"
                   src={mainImage || "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=800"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
               <div className="flex flex-col justify-center space-y-4">

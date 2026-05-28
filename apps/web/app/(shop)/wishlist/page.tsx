@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useCartStore } from "@/stores/cart-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useWishlistStore } from "@/stores/wishlist-store";
@@ -32,9 +33,11 @@ function WishlistProductCard({ item }: { item: WishlistItem }) {
         className="relative aspect-[4/3] bg-muted"
       >
         {image ? (
-          <img
+          <OptimizedImage
             src={image}
             alt={product.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="h-full w-full object-cover"
           />
         ) : (

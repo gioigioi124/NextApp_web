@@ -55,8 +55,14 @@ const demoProducts: Product[] = [
     stock: 24,
     category: demoCategories[0],
     images: [
-      { url: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80", alt: "Bộ chăn ga cotton sateen màu trắng" },
-      { url: "https://images.unsplash.com/photo-1615874959474-d609969a20ed?auto=format&fit=crop&w=1200&q=80", alt: "Phòng ngủ với ga trải giường sáng màu" },
+      {
+        url: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80",
+        alt: "Bộ chăn ga cotton sateen màu trắng",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1615874959474-d609969a20ed?auto=format&fit=crop&w=1200&q=80",
+        alt: "Phòng ngủ với ga trải giường sáng màu",
+      },
     ],
     variants: [
       { id: "v1", name: "1m6 x 2m - Trắng ngà", sku: "LUM-500-WH", price: 1590000, stock: 10, options: { size: "1m6 x 2m", color: "Trắng ngà" } },
@@ -78,8 +84,14 @@ const demoProducts: Product[] = [
     stock: 8,
     category: demoCategories[1],
     images: [
-      { url: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1200&q=80", alt: "Nệm foam hybrid trong phòng ngủ" },
-      { url: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80", alt: "Nệm phòng ngủ hiện đại" },
+      {
+        url: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1200&q=80",
+        alt: "Nệm foam hybrid trong phòng ngủ",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80",
+        alt: "Nệm phòng ngủ hiện đại",
+      },
     ],
     averageRating: 4.7,
     reviewCount: 84,
@@ -96,8 +108,14 @@ const demoProducts: Product[] = [
     stock: 42,
     category: demoCategories[2],
     images: [
-      { url: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=1200&q=80", alt: "Gối memory foam màu trắng" },
-      { url: "https://images.unsplash.com/photo-1567016526105-22da7c13161a?auto=format&fit=crop&w=1200&q=80", alt: "Gối trên giường ngủ" },
+      {
+        url: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=1200&q=80",
+        alt: "Gối memory foam màu trắng",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1567016526105-22da7c13161a?auto=format&fit=crop&w=1200&q=80",
+        alt: "Gối trên giường ngủ",
+      },
     ],
     averageRating: 4.6,
     reviewCount: 211,
@@ -114,8 +132,14 @@ const demoProducts: Product[] = [
     stock: 31,
     category: demoCategories[3],
     images: [
-      { url: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80", alt: "Chăn hè bamboo trên giường" },
-      { url: "https://images.unsplash.com/photo-1598928636135-d146006ff4be?auto=format&fit=crop&w=1200&q=80", alt: "Chăn mỏng màu sáng" },
+      {
+        url: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80",
+        alt: "Chăn hè bamboo trên giường",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1598928636135-d146006ff4be?auto=format&fit=crop&w=1200&q=80",
+        alt: "Chăn mỏng màu sáng",
+      },
     ],
     averageRating: 4.9,
     reviewCount: 57,
@@ -128,7 +152,9 @@ function toQueryString(query: ProductQuery) {
   const params = new URLSearchParams();
 
   Object.entries(query).forEach(([key, value]) => {
-    if (value) params.set(key, value);
+    if (value !== undefined && value !== null && value !== "") {
+      params.set(key, value);
+    }
   });
 
   return params.toString();
@@ -146,6 +172,7 @@ async function fetchJson<T>(
 ): Promise<T> {
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
+      headers: { Accept: "application/json" },
       next: {
         revalidate: options.revalidate ?? 60,
         tags: options.tags,
@@ -163,8 +190,8 @@ async function fetchJson<T>(
 }
 
 function filterDemoProducts(query: ProductQuery): ProductListResponse {
-  const page = Number(query.page) || 1;
-  const limit = Number(query.limit) || 12;
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.max(1, Number(query.limit) || 12);
   let products = [...demoProducts];
 
   if (query.search) {
@@ -216,10 +243,12 @@ export async function getCategories() {
 }
 
 export async function getProducts(query: ProductQuery = {}) {
-  const queryString = toQueryString({ limit: "12", ...query });
+  const normalizedQuery = { limit: "12", ...query };
+  const queryString = toQueryString(normalizedQuery);
+
   return fetchJson<ProductListResponse>(
     `/products?${queryString}`,
-    filterDemoProducts({ limit: "12", ...query }),
+    filterDemoProducts(normalizedQuery),
     { revalidate: 45, tags: ["products"] },
   );
 }

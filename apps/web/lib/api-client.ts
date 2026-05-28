@@ -54,7 +54,16 @@ class ApiClient {
       throw new ApiError(error?.message || "Request failed", response.status);
     }
 
-    return response.json();
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
+    const text = await response.text();
+    if (!text) {
+      return undefined as T;
+    }
+
+    return JSON.parse(text) as T;
   }
 
   private async refreshToken() {

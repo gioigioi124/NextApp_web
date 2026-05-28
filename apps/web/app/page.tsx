@@ -4,6 +4,7 @@ import { StorefrontFooter } from "@/components/layout/storefront-footer";
 import { StorefrontHeader } from "@/components/layout/storefront-header";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { getCategories, getFeaturedProducts, getProducts } from "@/services/catalog.service";
 
 export default async function Home() {
@@ -49,9 +50,12 @@ export default async function Home() {
               </div>
             </div>
             <div className="relative min-h-[320px] lg:min-h-[460px]">
-              <img
+              <OptimizedImage
                 src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=85"
                 alt="Phòng ngủ sáng với bộ chăn ga cao cấp"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 54vw"
                 className="absolute inset-0 h-full w-full rounded-lg object-cover shadow-2xl"
               />
               <div className="absolute bottom-4 left-4 rounded-lg bg-white/90 p-4 shadow-lg backdrop-blur">
@@ -96,9 +100,13 @@ export default async function Home() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {categories.slice(0, 4).map((category) => (
               <Link key={category.id} href={`/categories/${category.slug}`} className="group relative aspect-square overflow-hidden rounded-lg bg-muted">
-                {category.image ? (
-                  <img src={category.image} alt={category.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                ) : null}
+                <OptimizedImage
+                  src={category.image}
+                  alt={category.name}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
                   <h3 className="text-lg font-bold">{category.name}</h3>
@@ -137,11 +145,15 @@ export default async function Home() {
                   <Button variant="secondary" className="h-11 rounded-lg px-5">Mua combo</Button>
                 </Link>
               </div>
-              <img
-                src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85"
-                alt="Bộ phòng ngủ tối giản"
-                className="h-72 w-full object-cover md:h-full"
-              />
+              <div className="relative h-72 md:h-full md:min-h-80">
+                <OptimizedImage
+                  src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85"
+                  alt="Bộ phòng ngủ tối giản"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 44vw"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </section>

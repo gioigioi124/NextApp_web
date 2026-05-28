@@ -1,6 +1,7 @@
 node_modules
 .pnpm-store
 stitch_admin
+Generated_Bedding_Images
 
 # Environment
 .env

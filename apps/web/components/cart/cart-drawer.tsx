@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import {
   Sheet,
   SheetContent,
@@ -54,16 +55,16 @@ export function CartDrawer() {
                 <div key={item.id} className="grid grid-cols-[72px_1fr] gap-3 rounded-lg border border-border p-2">
                   <Link
                     href={`/products/${item.product.slug}`}
-                    className="aspect-square overflow-hidden rounded-md bg-muted"
+                    className="relative aspect-square overflow-hidden rounded-md bg-muted"
                     onClick={closeCart}
                   >
-                    {item.product.image ? (
-                      <img
-                        src={item.product.image}
-                        alt={item.product.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : null}
+                    <OptimizedImage
+                      src={item.product.image}
+                      alt={item.product.name}
+                      fill
+                      sizes="72px"
+                      className="h-full w-full object-cover"
+                    />
                   </Link>
                   <div className="min-w-0">
                     <div className="flex items-start gap-2">
@@ -129,7 +130,7 @@ export function CartDrawer() {
         {items.length > 0 ? (
           <SheetFooter className="border-t border-border">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Tam tinh</span>
+              <span className="text-muted-foreground">Tạm tính</span>
               <span className="text-lg font-bold text-foreground">{formatPrice(totalPrice)}</span>
             </div>
             <Link

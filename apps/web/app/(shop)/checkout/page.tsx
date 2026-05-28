@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -360,7 +361,13 @@ export default function CheckoutPage() {
                   <div key={item.id} className="flex gap-4">
                     <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
                       {item.product.image ? (
-                        <img src={item.product.image} alt={item.product.name} className="h-full w-full object-cover" />
+                        <OptimizedImage
+                          src={item.product.image}
+                          alt={item.product.name}
+                          fill
+                          sizes="80px"
+                          className="h-full w-full object-cover"
+                        />
                       ) : null}
                       <span className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                         {item.quantity}

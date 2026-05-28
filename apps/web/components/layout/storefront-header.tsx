@@ -16,9 +16,9 @@ import {
   User,
   X,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandDialog,
@@ -28,6 +28,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import {
   Sheet,
   SheetContent,
@@ -121,9 +122,15 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
           `${API_URL}/products/suggestions?q=${encodeURIComponent(keyword)}&limit=6`,
           { signal: controller.signal },
         );
+
+        if (!response.ok) {
+          setResults([]);
+          return;
+        }
+
         const json = await response.json();
         setResults(json.data || []);
-      } catch (error) {
+      } catch {
         if (!controller.signal.aborted) {
           setResults([]);
         }
@@ -246,7 +253,7 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="hidden h-9 items-center gap-2 rounded-full bg-muted px-4 py-1.5 transition-all focus-within:border-primary lg:flex"
+              className="hidden h-9 items-center gap-2 rounded-full bg-muted px-4 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 lg:flex"
             >
               <Search className="size-4 text-muted-foreground" />
               <span className="w-48 text-left text-sm text-muted-foreground">Tìm sản phẩm...</span>
@@ -255,7 +262,7 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(true)} aria-label="Tìm kiếm">
               <Search className="size-5" />
             </Button>
-            
+
             <div className="flex gap-3">
               <ThemeToggle className="hidden sm:inline-flex" />
               <Link
@@ -330,7 +337,7 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
                 onClick={submitSearch}
                 className="mt-3 flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-left text-sm font-medium text-foreground transition hover:bg-muted"
               >
-                <span>Tìm tất cả kết quả cho “{query.trim()}”</span>
+                <span>Tìm tất cả kết quả cho "{query.trim()}"</span>
                 <ArrowRight className="size-4 text-primary" />
               </button>
             ) : null}
@@ -340,7 +347,9 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
             <CommandEmpty>
               <div className="py-8 text-center">
                 <p className="font-medium text-foreground">Không có sản phẩm phù hợp</p>
-                <p className="mt-1 text-sm text-muted-foreground">Thử tìm “cotton”, “nệm” hoặc “gối”.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Thử tìm "cotton", "nệm" hoặc "gối".
+                </p>
               </div>
             </CommandEmpty>
             {visibleResults.length > 0 ? (
@@ -352,10 +361,14 @@ export function StorefrontHeader({ categories, suggestions = [] }: StorefrontHea
                     onSelect={() => openProduct(product)}
                     className="gap-3 rounded-lg p-2"
                   >
-                    <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border">
-                      {product.images?.[0]?.url ? (
-                        <img src={product.images[0].url} alt={product.name} className="h-full w-full object-cover" />
-                      ) : null}
+                    <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border">
+                      <OptimizedImage
+                        src={product.images?.[0]?.url}
+                        alt={product.name}
+                        fill
+                        sizes="56px"
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-foreground">{product.name}</p>

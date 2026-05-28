@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { ImageIcon, ShoppingBag, Star } from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { WishlistButton } from "@/components/product/wishlist-button";
-import type { Product } from "@/types/storefront";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart-store";
+import type { Product } from "@/types/storefront";
 import { formatPrice } from "shared-utils";
 
 type ProductCardProps = {
@@ -27,7 +25,7 @@ function getDiscountPercent(product: Product) {
   return Math.round(((price - salePrice) / price) * 100);
 }
 
-export function ProductCard({ product, compact = false }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const images = product.images || [];
   const primaryImage = images[0]?.url;
@@ -37,23 +35,26 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
 
   return (
     <div className="product-card group relative flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:shadow-lg">
-      {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <Link href={`/products/${product.slug}`} aria-label={product.name}>
           {primaryImage ? (
             <>
-              <img
+              <OptimizedImage
                 src={primaryImage}
                 alt={images[0]?.alt || product.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className={cn(
                   "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
                   hoverImage !== primaryImage && "group-hover:opacity-0",
                 )}
               />
               {hoverImage !== primaryImage ? (
-                <img
+                <OptimizedImage
                   src={hoverImage}
                   alt={images[1]?.alt || product.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
               ) : null}
@@ -65,7 +66,6 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           )}
         </Link>
 
-        {/* Badges */}
         <div className="absolute left-3 top-3 flex flex-col gap-2">
           {discount ? (
             <span className="rounded-lg bg-accent px-2.5 py-1 text-[10px] font-bold tracking-wider text-white">
@@ -79,20 +79,18 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           ) : null}
         </div>
 
-        {/* Wishlist Button */}
         <WishlistButton
           productId={product.id}
           iconOnly
           className="absolute right-3 top-3 h-8 w-8 rounded-lg bg-white/90 text-muted-foreground shadow-sm backdrop-blur transition-all hover:text-destructive active:scale-95"
         />
 
-        {/* Quick Add Overlay */}
         <div className="absolute inset-x-3 bottom-3 translate-y-10 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <button
             type="button"
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-xs font-bold text-white shadow-md transition-transform active:scale-95 disabled:opacity-50"
-            onClick={async (e) => {
-              e.preventDefault();
+            onClick={async (event) => {
+              event.preventDefault();
               try {
                 await addItem(product, 1);
                 toast.success(`Đã thêm ${product.name} vào giỏ hàng`);
@@ -108,12 +106,11 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="flex flex-1 flex-col p-4">
         <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           {product.category?.name || product.tags?.[0] || "Lumina Premium"}
         </p>
-        
+
         <Link
           href={`/products/${product.slug}`}
           className="mb-3 line-clamp-2 min-h-10 text-sm font-semibold leading-tight text-foreground transition-colors group-hover:text-primary"
@@ -138,7 +135,9 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           <div className="flex items-baseline gap-2">
             <span className="text-base font-bold text-primary">{formatPrice(currentPrice)}</span>
             {product.salePrice ? (
-              <span className="text-sm font-medium text-muted-foreground line-through">{formatPrice(Number(product.price))}</span>
+              <span className="text-sm font-medium text-muted-foreground line-through">
+                {formatPrice(Number(product.price))}
+              </span>
             ) : null}
           </div>
         </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cart-store";
 import { formatPrice } from "shared-utils";
@@ -63,10 +64,16 @@ export default function CartPage() {
                 <div key={item.id} className="grid gap-4 p-4 sm:grid-cols-[112px_1fr_auto]">
                   <Link
                     href={`/products/${item.product.slug}`}
-                    className="aspect-square overflow-hidden rounded-lg bg-muted"
+                    className="relative aspect-square overflow-hidden rounded-lg bg-muted"
                   >
                     {item.product.image ? (
-                      <img src={item.product.image} alt={item.product.name} className="h-full w-full object-cover" />
+                      <OptimizedImage
+                        src={item.product.image}
+                        alt={item.product.name}
+                        fill
+                        sizes="112px"
+                        className="h-full w-full object-cover"
+                      />
                     ) : null}
                   </Link>
 
