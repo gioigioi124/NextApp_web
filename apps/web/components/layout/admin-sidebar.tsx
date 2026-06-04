@@ -13,6 +13,7 @@ import {
   Users,
   FileText,
   Gift,
+  ImageIcon,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ const menuItems = [
   { icon: Package, label: "Sản phẩm", href: "/admin/products" },
   { icon: Layers, label: "Danh mục", href: "/admin/categories" },
   { icon: FileText, label: "Bài viết / Trang", href: "/admin/posts" },
+  { icon: ImageIcon, label: "Banner / Slider", href: "/admin/banners" },
   { icon: Gift, label: "Khuyến mãi", href: "/admin/promotions" },
   { icon: ShoppingCart, label: "Đơn hàng", href: "/admin/orders" },
   { icon: Users, label: "Người dùng", href: "/admin/users" },

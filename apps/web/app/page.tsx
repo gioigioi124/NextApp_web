@@ -6,65 +6,44 @@ import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { getCategories, getFeaturedProducts, getProducts } from "@/services/catalog.service";
+import { HeroSlider } from "@/components/home/hero-slider";
+import { PromotionalBanner } from "@/components/home/promotional-banner";
+
+async function getActiveBanners(position: string) {
+  try {
+    const res = await fetch(`${process.env.API_URL || 'http://localhost:8000/api/v1'}/banners?position=${position}`, {
+      next: { revalidate: 60 }
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.filter((b: any) => b.isActive);
+  } catch (error) {
+    return [];
+  }
+}
 
 export default async function Home() {
-  const [{ data: categories }, { data: featuredProducts }, newArrivals] = await Promise.all([
+  const [
+    { data: categories }, 
+    { data: featuredProducts }, 
+    newArrivals,
+    heroBanners,
+    promoBanners
+  ] = await Promise.all([
     getCategories(),
     getFeaturedProducts(8),
     getProducts({ limit: "8" }),
+    getActiveBanners("HERO"),
+    getActiveBanners("PROMOTIONAL")
   ]);
+
+  const promoBanner = promoBanners.length > 0 ? promoBanners[0] : null;
 
   return (
     <div className="min-h-screen bg-background">
       <StorefrontHeader categories={categories} suggestions={featuredProducts} />
       <main>
-        <section className="relative overflow-hidden bg-[#E8EBFA]">
-          <div className="mx-auto grid min-h-[520px] max-w-7xl items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
-            <div className="z-10 max-w-xl">
-              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-secondary">
-                Bộ sưu tập nghỉ ngơi 2026
-              </p>
-              <h1 className="[font-family:var(--font-heading)] text-4xl font-bold leading-tight text-primary sm:text-5xl lg:text-6xl">
-                Giấc ngủ ngon bắt đầu từ những điều nhỏ nhẹ
-              </h1>
-              <p className="mt-5 text-base leading-7 text-foreground/75 sm:text-lg">
-                Chăn ga, gối và nệm được chọn lọc cho khí hậu Việt Nam: mềm, thoáng, dễ chăm sóc và bền trong nhịp sống hằng ngày.
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/products">
-                  <Button className="h-12 w-full gap-2 rounded-lg bg-primary px-6 text-base sm:w-auto">
-                    Khám phá ngay
-                    <ArrowRight className="size-4" />
-                  </Button>
-                </Link>
-                <Link href="/categories/bo-chan-ga">
-                  <Button variant="outline" className="h-12 w-full rounded-lg bg-white/70 px-6 text-base sm:w-auto">
-                    Xem bộ chăn ga
-                  </Button>
-                </Link>
-              </div>
-              <div className="mt-8 grid gap-3 text-sm text-foreground/70 sm:grid-cols-3">
-                <span className="flex items-center gap-2"><Truck className="size-4 text-secondary" /> Miễn phí ship</span>
-                <span className="flex items-center gap-2"><RefreshCw className="size-4 text-secondary" /> Đổi trả 30 ngày</span>
-                <span className="flex items-center gap-2"><ShieldCheck className="size-4 text-secondary" /> Hàng chính hãng</span>
-              </div>
-            </div>
-            <div className="relative min-h-[320px] lg:min-h-[460px]">
-              <OptimizedImage
-                src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=85"
-                alt="Phòng ngủ sáng với bộ chăn ga cao cấp"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 54vw"
-                className="absolute inset-0 h-full w-full rounded-lg object-cover shadow-2xl"
-              />
-              <div className="absolute bottom-4 left-4 rounded-lg bg-white/90 p-4 shadow-lg backdrop-blur">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Bán chạy tháng này</p>
-                <p className="mt-1 font-semibold text-foreground">Cotton Sateen 500TC</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <HeroSlider slides={heroBanners} />
 
         <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -132,31 +111,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="overflow-hidden rounded-lg bg-primary text-primary-foreground">
-            <div className="grid items-center gap-6 md:grid-cols-[1fr_0.8fr]">
-              <div className="p-8 md:p-10">
-                <p className="text-sm font-semibold uppercase tracking-wide text-white/70">Ưu đãi theo mùa</p>
-                <h2 className="[font-family:var(--font-heading)] mt-2 text-3xl font-semibold">Làm mới phòng ngủ với combo tiết kiệm</h2>
-                <p className="mt-3 max-w-xl text-white/75">
-                  Chọn đồng bộ chăn, ga, gối và topper với bảng màu dịu mắt. Áp dụng cho đơn combo từ 2 sản phẩm.
-                </p>
-                <Link href="/products?maxPrice=2000000" className="mt-6 inline-flex">
-                  <Button variant="secondary" className="h-11 rounded-lg px-5">Mua combo</Button>
-                </Link>
-              </div>
-              <div className="relative h-72 md:h-full md:min-h-80">
-                <OptimizedImage
-                  src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85"
-                  alt="Bộ phòng ngủ tối giản"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 44vw"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+        {promoBanner && <PromotionalBanner banner={promoBanner} />}
 
         <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="mb-6 flex items-end justify-between">
