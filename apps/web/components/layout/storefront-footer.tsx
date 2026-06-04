@@ -42,10 +42,10 @@ export function StorefrontFooter({ categories }: StorefrontFooterProps) {
         <div>
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-white">Hỗ trợ</h3>
           <div className="grid gap-2 text-sm text-white/75">
-            <Link href="#" className="hover:text-white">Chính sách đổi trả</Link>
-            <Link href="#" className="hover:text-white">Hướng dẫn chọn size</Link>
-            <Link href="#" className="hover:text-white">Vận chuyển</Link>
-            <Link href="#" className="hover:text-white">Câu hỏi thường gặp</Link>
+            <Link href="/pages/chinh-sach-doi-tra" className="hover:text-white">Chính sách đổi trả</Link>
+            <Link href="/pages/ve-chung-toi" className="hover:text-white">Về chúng tôi</Link>
+            <Link href="/pages/dieu-khoan-dich-vu" className="hover:text-white">Điều khoản dịch vụ</Link>
+            <Link href="/pages/cau-hoi-thuong-gap" className="hover:text-white">Câu hỏi thường gặp</Link>
           </div>
         </div>
 

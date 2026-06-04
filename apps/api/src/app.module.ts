@@ -14,6 +14,8 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { PostsModule } from './modules/posts/posts.module';
+import { PromotionsModule } from './modules/promotions/promotions.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -35,6 +37,8 @@ import { PrismaModule } from './prisma/prisma.module';
     WishlistModule,
     DashboardModule,
     UploadModule,
+    PostsModule,
+    PromotionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

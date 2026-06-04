@@ -23,6 +23,7 @@ model User {
   reviews       Review[]
   cart          Cart?
   wishlist      Wishlist?
+  posts         Post[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -230,4 +231,58 @@ model Coupon {
 enum DiscountType {
   PERCENTAGE
   FIXED
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PostType {
+  BLOG
+  PAGE
+}
+
+model Post {
+  id              String      @id @default(cuid())
+  title           String
+  slug            String      @unique
+  content         String      @db.Text
+  excerpt         String?     @db.Text
+  thumbnail       String?
+  status          PostStatus  @default(DRAFT)
+  type            PostType    @default(BLOG)
+  authorId        String
+  author          User        @relation(fields: [authorId], references: [id])
+  seoTitle        String?
+  seoDescription  String?
+  publishedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([slug])
+  @@index([type])
+  @@index([status])
+}
+
+model Promotion {
+  id            String       @id @default(cuid())
+  name          String
+  description   String?
+  discountType  DiscountType
+  discountValue Decimal      @db.Decimal(12, 2)
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean      @default(true)
+  
+  minOrderValue Decimal?     @db.Decimal(12, 2)
+  minQuantity   Int?
+  
+  appliesToAll  Boolean      @default(false)
+  categoryIds   String[]
+  productIds    String[]
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
