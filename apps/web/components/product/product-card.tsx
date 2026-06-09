@@ -34,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const currentPrice = Number(product.salePrice || product.price);
 
   return (
-    <div className="product-card group relative flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:shadow-lg">
+    <div className="product-card group relative flex flex-col overflow-hidden rounded-3xl bg-card border border-border/40 shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-500 hover:shadow-[0_16px_40px_rgb(0,0,0,0.12)]">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <Link href={`/products/${product.slug}`} aria-label={product.name}>
           {primaryImage ? (
@@ -82,13 +82,13 @@ export function ProductCard({ product }: ProductCardProps) {
         <WishlistButton
           productId={product.id}
           iconOnly
-          className="absolute right-3 top-3 h-8 w-8 rounded-lg bg-white/90 text-muted-foreground shadow-sm backdrop-blur transition-all hover:text-destructive active:scale-95"
+          className="absolute right-4 top-4 h-9 w-9 rounded-full bg-white/90 text-muted-foreground shadow-sm backdrop-blur transition-all hover:bg-white hover:text-destructive active:scale-95"
         />
 
-        <div className="absolute inset-x-3 bottom-3 translate-y-10 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="absolute inset-x-4 bottom-4 translate-y-10 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-xs font-bold text-white shadow-md transition-transform active:scale-95 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-primary/95 py-3 text-[11px] font-semibold tracking-wide text-white shadow-md transition-all duration-300 hover:bg-primary active:scale-95 disabled:opacity-50"
             onClick={async (event) => {
               event.preventDefault();
               try {
@@ -100,14 +100,14 @@ export function ProductCard({ product }: ProductCardProps) {
             }}
             disabled={product.stock <= 0}
           >
-            <ShoppingBag className="size-4" />
+            <ShoppingBag className="size-4 stroke-[1.5]" />
             {product.stock > 0 ? "THÊM VÀO GIỎ" : "HẾT HÀNG"}
           </button>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="flex flex-1 flex-col p-5">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80">
           {product.category?.name || product.tags?.[0] || "Lumina Premium"}
         </p>
 

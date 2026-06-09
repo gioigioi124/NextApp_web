@@ -43,7 +43,7 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
         <CarouselContent>
           {slides.map((slide) => (
             <CarouselItem key={slide.id} className="relative w-full">
-              <div className="relative h-[400px] w-full md:h-[500px]">
+              <div className="relative h-[450px] w-full md:h-[600px]">
                 <OptimizedImage
                   src={slide.image}
                   alt={slide.title}
@@ -52,22 +52,22 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
                   className="object-cover"
                   sizes="(max-width: 1280px) 100vw, 1280px"
                 />
-                <div className="absolute inset-0 flex items-center p-6 md:p-12">
-                  <div className="max-w-xl rounded-2xl bg-black/30 p-6 md:p-8 backdrop-blur-[1px] text-white border border-white/10 shadow-2xl">
-                    <p className="mb-3 text-xs md:text-sm font-bold uppercase tracking-widest text-primary-foreground/90">
+                <div className="absolute inset-0 flex items-center p-6 md:p-12 lg:p-16">
+                  <div className="max-w-xl rounded-3xl bg-white/10 p-8 md:p-10 backdrop-blur-md text-white border border-white/20 shadow-2xl transition-all duration-500">
+                    <p className="mb-4 text-xs md:text-sm font-medium uppercase tracking-[0.2em] text-white/90">
                       {slide.subtitle}
                     </p>
-                    <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl text-white">
+                    <h1 className="font-heading text-4xl font-light leading-tight sm:text-5xl text-white tracking-tight">
                       {slide.title}
                     </h1>
-                    <p className="mt-4 text-sm md:text-base leading-relaxed text-white/90">
+                    <p className="mt-5 text-sm md:text-base leading-loose text-white/80 font-light">
                       {slide.description}
                     </p>
-                    <div className="mt-6 flex gap-4">
-                      <Link href={slide.link}>
-                        <Button className="h-11 gap-2 bg-primary px-6 text-primary-foreground hover:bg-primary/90 rounded-xl">
+                    <div className="mt-8 flex gap-4">
+                      <Link href={slide.link || "#"}>
+                        <Button className="h-12 gap-2 bg-white px-8 text-black hover:bg-white/90 rounded-full font-medium transition-all duration-300 shadow-[0_4px_20px_rgb(0,0,0,0.1)] hover:shadow-[0_4px_25px_rgb(255,255,255,0.3)]">
                           {slide.buttonText}
-                          <ArrowRight className="size-4" />
+                          <ArrowRight className="size-4 stroke-[1.5]" />
                         </Button>
                       </Link>
                     </div>
@@ -77,9 +77,9 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <div className="absolute bottom-6 right-6 flex items-center gap-2">
-          <CarouselPrevious className="static translate-y-0 h-10 w-10 bg-black/40 text-white hover:bg-black hover:text-white border-white/20 backdrop-blur-md" />
-          <CarouselNext className="static translate-y-0 h-10 w-10 bg-black/40 text-white hover:bg-black hover:text-white border-white/20 backdrop-blur-md" />
+        <div className="absolute bottom-8 right-8 flex items-center gap-3">
+          <CarouselPrevious className="static translate-y-0 h-12 w-12 rounded-full bg-white/10 text-white hover:bg-white hover:text-black border border-white/30 backdrop-blur-md transition-all duration-300" />
+          <CarouselNext className="static translate-y-0 h-12 w-12 rounded-full bg-white/10 text-white hover:bg-white hover:text-black border border-white/30 backdrop-blur-md transition-all duration-300" />
         </div>
       </Carousel>
     </div>
