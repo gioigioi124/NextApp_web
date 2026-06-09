@@ -18,10 +18,10 @@ const promotionSchema = z.object({
   discountValue: z.coerce.number().min(0, "Giá trị giảm không hợp lệ"),
   startDate: z.string().min(1, "Vui lòng chọn ngày bắt đầu"),
   endDate: z.string().min(1, "Vui lòng chọn ngày kết thúc"),
-  isActive: z.boolean().default(true),
-  minOrderValue: z.coerce.number().optional().nullable(),
-  minQuantity: z.coerce.number().optional().nullable(),
-  appliesToAll: z.boolean().default(true),
+  isActive: z.boolean(),
+  minOrderValue: z.coerce.number().optional(),
+  minQuantity: z.coerce.number().optional(),
+  appliesToAll: z.boolean(),
 });
 
 type PromotionFormValues = z.infer<typeof promotionSchema>;

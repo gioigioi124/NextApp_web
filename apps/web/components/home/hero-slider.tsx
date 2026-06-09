@@ -41,14 +41,14 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
         onMouseLeave={plugin.current.reset}
       >
         <CarouselContent>
-          {slides.map((slide) => (
+          {slides.map((slide, index) => (
             <CarouselItem key={slide.id} className="relative w-full">
               <div className="relative h-[450px] w-full md:h-[600px]">
                 <OptimizedImage
                   src={slide.image}
                   alt={slide.title}
                   fill
-                  priority={slide.id === 1}
+                  priority={index === 0}
                   className="object-cover"
                   sizes="(max-width: 1280px) 100vw, 1280px"
                 />

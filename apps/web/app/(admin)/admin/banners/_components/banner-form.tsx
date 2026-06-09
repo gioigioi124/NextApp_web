@@ -18,9 +18,9 @@ const bannerSchema = z.object({
   image: z.string().min(1, "Vui lòng chọn ảnh"),
   link: z.string().optional(),
   buttonText: z.string().optional(),
-  position: z.string().default("HERO"),
-  isActive: z.boolean().default(true),
-  order: z.coerce.number().default(0),
+  position: z.string(),
+  isActive: z.boolean(),
+  order: z.coerce.number(),
 });
 
 type BannerFormValues = z.infer<typeof bannerSchema>;
@@ -159,9 +159,12 @@ export function BannerForm({ initialData }: BannerFormProps) {
               <ImageUpload
                 value={form.watch("image") ? [form.watch("image")] : []}
                 onChange={(urls) => {
-                  if (urls.length > 0) form.setValue("image", urls[0], { shouldValidate: true });
+                  if (urls.length > 0) {
+                    form.setValue("image", urls[0], { shouldValidate: true });
+                  } else {
+                    form.setValue("image", "", { shouldValidate: true });
+                  }
                 }}
-                onRemove={() => form.setValue("image", "", { shouldValidate: true })}
                 maxFiles={1}
               />
               {form.formState.errors.image && <p className="text-destructive text-sm">{form.formState.errors.image.message}</p>}
@@ -187,7 +190,9 @@ export function BannerForm({ initialData }: BannerFormProps) {
             <div className="space-y-2">
               <label className="text-sm font-medium">Trạng thái</label>
               <select 
-                {...form.register("isActive")} 
+                {...form.register("isActive", {
+                  setValueAs: (v) => v === "true" || v === true
+                })} 
                 className="w-full bg-input border-none rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-ring transition-all"
               >
                 <option value="true">Hiển thị</option>

@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-form-hooks"; // Wait, I should use react-hook-form
-import { useForm as useRHForm, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,6 @@ import { Save, ArrowLeft, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
 import { Editor } from "@/components/ui/editor";
 import { ImageUpload } from "@/components/product/image-upload";
-import { slugify } from "@/lib/utils";
 
 const postSchema = z.object({
   title: z.string().min(1, "Tiêu đề không được để trống"),
@@ -23,8 +21,8 @@ const postSchema = z.object({
   content: z.string().min(1, "Nội dung không được để trống"),
   excerpt: z.string().optional(),
   thumbnail: z.string().optional(),
-  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
-  type: z.enum(["BLOG", "PAGE"]).default("BLOG"),
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
+  type: z.enum(["BLOG", "PAGE"]),
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
 });
@@ -39,7 +37,7 @@ export function PostForm({ initialData }: PostFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const form = useRHForm<PostFormValues>({
+  const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
     defaultValues: initialData || {
       title: "",
