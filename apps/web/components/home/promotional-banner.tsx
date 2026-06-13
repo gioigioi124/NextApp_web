@@ -22,10 +22,12 @@ export function PromotionalBanner({ banner }: { banner: BannerData | null }) {
         <div className="grid items-center gap-6 md:grid-cols-[1.2fr_0.8fr] relative z-20">
           <div className="p-8 md:p-12 lg:p-16">
             {banner.subtitle && (
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-white/90">{banner.subtitle}</p>
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-black/90">
+                {banner.subtitle}
+              </p>
             )}
-            <h2 className="font-heading mt-4 text-4xl font-light leading-tight sm:text-5xl text-white tracking-tight">
-              {banner.title.split('\\n').map((line, i) => (
+            <h2 className="font-heading mt-4 text-4xl font-light leading-tight sm:text-5xl text-black tracking-tight">
+              {banner.title.split("\\n").map((line, i) => (
                 <span key={i}>
                   {line}
                   <br />
@@ -39,7 +41,10 @@ export function PromotionalBanner({ banner }: { banner: BannerData | null }) {
             )}
             {banner.link && (
               <Link href={banner.link} className="mt-8 inline-flex">
-                <Button size="lg" className="h-12 rounded-full bg-white text-secondary hover:bg-white/90 px-8 font-medium shadow-sm transition-all duration-300">
+                <Button
+                  size="lg"
+                  className="h-12 rounded-full bg-white text-secondary hover:bg-white/90 px-8 font-medium shadow-sm transition-all duration-300"
+                >
                   {banner.buttonText || "Khám phá ngay"}
                 </Button>
               </Link>

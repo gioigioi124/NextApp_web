@@ -52,20 +52,21 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
                   className="object-cover"
                   sizes="(max-width: 1280px) 100vw, 1280px"
                 />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/10 to-transparent pointer-events-none" />
                 <div className="absolute inset-0 flex items-center p-6 md:p-12 lg:p-16">
-                  <div className="max-w-xl rounded-3xl bg-white/10 p-8 md:p-10 backdrop-blur-md text-white border border-white/20 shadow-2xl transition-all duration-500">
-                    <p className="mb-4 text-xs md:text-sm font-medium uppercase tracking-[0.2em] text-white/90">
+                  <div className="max-w-xl text-white">
+                    <p className="mb-4 text-xs md:text-sm font-medium uppercase tracking-[0.2em] text-white/90 drop-shadow-md">
                       {slide.subtitle}
                     </p>
-                    <h1 className="font-heading text-4xl font-light leading-tight sm:text-5xl text-white tracking-tight">
+                    <h1 className="font-heading text-4xl font-light leading-tight sm:text-5xl text-white tracking-tight drop-shadow-lg">
                       {slide.title}
                     </h1>
-                    <p className="mt-5 text-sm md:text-base leading-loose text-white/80 font-light">
+                    <p className="mt-5 text-sm md:text-base leading-relaxed text-white/90 font-light drop-shadow-md">
                       {slide.description}
                     </p>
                     <div className="mt-8 flex gap-4">
                       <Link href={slide.link || "#"}>
-                        <Button className="h-12 gap-2 bg-white px-8 text-black hover:bg-white/90 rounded-full font-medium transition-all duration-300 shadow-[0_4px_20px_rgb(0,0,0,0.1)] hover:shadow-[0_4px_25px_rgb(255,255,255,0.3)]">
+                        <Button className="h-12 gap-2 bg-white px-8 text-black hover:bg-white/90 rounded-full font-medium transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
                           {slide.buttonText}
                           <ArrowRight className="size-4 stroke-[1.5]" />
                         </Button>
